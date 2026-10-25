@@ -29,7 +29,7 @@
   "isChromeOSOnly": false,
   "isMetaQuest": false,
   "fullScopeUrl": "https://aladeen35.github.io/ameer-gift/",
-  "minSdkVersion": 21,
+  "minSdkVersion": 24,
   "orientation": "default",
   "fingerprints": [],
   "additionalTrustedOrigins": [],
