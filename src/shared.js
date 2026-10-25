@@ -2,15 +2,21 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
   createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail,
-  onAuthStateChanged, signOut, updateProfile, signInAnonymously } from "firebase/auth";
+  onAuthStateChanged, signOut, updateProfile, signInAnonymously, connectAuthEmulator } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, collection, query, where,
-  orderBy, getDocs, onSnapshot, serverTimestamp, Timestamp, writeBatch, increment, limit, deleteField, arrayUnion } from "firebase/firestore";
+  orderBy, getDocs, onSnapshot, serverTimestamp, Timestamp, writeBatch, increment, limit, deleteField, arrayUnion, connectFirestoreEmulator } from "firebase/firestore";
 import { CONFIG } from "./config.js";
 
 export const firebaseConfig = CONFIG.firebase;
-export const app = initializeApp(firebaseConfig);
+// Local test mode: ?emu=1 on localhost talks to the Firebase emulators instead of the live project
+export const EMU = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && /[?&]emu=1/.test(location.search);
+export const app = initializeApp(EMU ? { ...firebaseConfig, projectId: "demo-ameer-gift" } : firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+if (EMU) {
+  connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+  connectFirestoreEmulator(db, "127.0.0.1", 8080);
+}
 export const fs = { doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, collection, query, where, orderBy, getDocs, onSnapshot, serverTimestamp, Timestamp, writeBatch, increment, limit, deleteField, arrayUnion };
 export const au = { onAuthStateChanged, signOut, updateProfile, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signInAnonymously };
 

@@ -49,6 +49,7 @@ jobs:
             keytool -genkeypair -v -keystore android.keystore -alias ameergift -keyalg RSA -keysize 2048 -validity 10000 \
               -storepass "$PASS" -keypass "$PASS" -dname "CN=Ameer Gift, O=Ameer Gift, C=SA"
             echo "$PASS" > keystore-password.txt
+            base64 -w0 android.keystore > android.keystore.base64.txt
             echo "KEYSTORE_PASSWORD=$PASS" >> "$GITHUB_ENV"
             echo "new=true" >> "$GITHUB_OUTPUT"
           fi
@@ -57,7 +58,9 @@ jobs:
           cd android
           VC=$(( 100 + ${{ github.run_number }} ))
           VN="${{ github.event.inputs.version_name || github.ref_name }}"; VN="${VN#v}"; echo "$VN" | grep -Eq '^[0-9]+(\.[0-9]+)*$' || VN="1.0.0"
-          node -e "const f='twa-manifest.json';const m=require('./'+f);m.appVersionCode=$VC;m.appVersionName='$VN';require('fs').writeFileSync(f,JSON.stringify(m,null,2))"
+          # icons come from the repo (served locally), so the build works even before the site is published
+          (cd ../public && python3 -m http.server 8765 >/dev/null 2>&1 &) ; sleep 2
+          node -e "const f='twa-manifest.json';const m=require('./'+f);m.appVersionCode=$VC;m.appVersionName='$VN';m.iconUrl='http://127.0.0.1:8765/icon-512.png';m.maskableIconUrl='http://127.0.0.1:8765/icon-maskable-512.png';require('fs').writeFileSync(f,JSON.stringify(m,null,2))"
           bubblewrap update --skipVersionUpgrade --manifest=./twa-manifest.json
       - name: Build signed APK and AAB
         run: |
@@ -87,5 +90,6 @@ jobs:
           name: KEEP-THIS-SAFE-android-signing-key
           path: |
             android/android.keystore
+            android/android.keystore.base64.txt
             android/keystore-password.txt
           retention-days: 7

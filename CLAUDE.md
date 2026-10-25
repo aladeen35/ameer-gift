@@ -81,6 +81,21 @@ Read this whole file before doing anything. Then explore the repo, propose a pha
 - **Multiplayer (Claude artifact runtime only):** presence of other visitors as avatars with name/photo labels; likes and comments persisted per visitor. This used Claude's artifact APIs (`window.claude.use('room'|'db'|'user'|'downloads')`), which **do not exist on GitHub Pages** — reimplement with Firebase.
 - Full Arabic/English switching including 3D text (plaques, dedication, labels).
 
+## 4.5 Status after the first build (Oct 2026)
+
+Done (everything that works on the free Spark plan):
+- Vite multi-page build (`index.html`, `admin.html`, `museum.html`, `credits.html`); sources in `src/`, static files in `public/`.
+- `museum.html` = `src/museum/*`: waiting page, access code, character picker, hall templates (classic/garden/wedding/grad) with optional side room,
+  realistic Rocketbox avatars + mocap clips (medium/high), Quaternius lite avatars with procedural walk (low), quality tiers, bloom/AO/SMAA,
+  spotlights that follow the nearest paintings, sitting on benches, emotes, viewer with likes/comments, owner moderation, live visitors (RTDB),
+  capacity check, visit counter, trial expiry screen. Demo mode: `museum.html?demo=1&tpl=garden&side=1&soon=60`.
+- Avatars are rebuilt with `npm run avatars` (`tools/build-avatars.mjs`), thumbnails with `node tools/make-thumbs.mjs` (dev server running).
+- Rules: `firestore.rules`, `database.rules.json`, tests in `tests/rules/` (`npm run test:rules`, Java needed).
+- CI: `.github/workflows/deploy.yml` (lint, build, rules tests, Playwright at 390×844, deploy from `main`), `android.yml` (Bubblewrap TWA).
+- Owner console steps: `docs/OWNER-STEPS-AR.md`.
+
+Still needs Blaze: Storage (songs, video, photo migration), Cloud Functions (AI captions, server-side PIN check, payments).
+
 ## 5. What to build (proposed phases — refine after exploring)
 
 **Phase 0 — Foundation**

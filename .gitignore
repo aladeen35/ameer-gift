@@ -13,3 +13,4 @@ android/build/
 android/*.apk
 android/*.aab
 android/.gradle/
+android/android.keystore.base64.txt

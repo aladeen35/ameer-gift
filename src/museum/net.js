@@ -1,7 +1,7 @@
 // Museum data: public teaser, PIN -> vault, photos, likes/comments, live presence and visit counting.
 import { auth, db, fs, au, vaultKey, latinDigits } from "../shared.js";
-import { getDatabase, ref, onValue, set, update, remove, onDisconnect, get, serverTimestamp as rtNow } from "firebase/database";
-import { app } from "../shared.js";
+import { getDatabase, ref, onValue, set, update, remove, onDisconnect, get, serverTimestamp as rtNow, connectDatabaseEmulator } from "firebase/database";
+import { app, EMU } from "../shared.js";
 import { CONFIG } from "../config.js";
 
 export async function ensureUser() {
@@ -77,6 +77,7 @@ export class Presence {
     if (!CONFIG.firebase.databaseURL) return { ok: false };
     try {
       this.rtdb = getDatabase(app);
+      if (EMU && !Presence.emu) { connectDatabaseEmulator(this.rtdb, "127.0.0.1", 9000); Presence.emu = true; }
       this.uid = auth.currentUser.uid;
       this.base = ref(this.rtdb, `presence/${this.key}`);
       const snap = await Promise.race([get(this.base), new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 6000))]);

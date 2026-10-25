@@ -55,8 +55,11 @@ let my = null; // my avatar
 const ghosts = new Map(); let presence = null;
 
 /* ---------- small UI helpers ---------- */
-function loaderMsg(m, p) { $("#lmsg").textContent = m; if (p != null) $("#lbar").style.width = Math.round(p * 100) + "%"; }
-function hideLoader() { const l = $("#loader"); if (!l) return; l.style.opacity = 0; setTimeout(() => l.remove(), 500); }
+function loaderMsg(m, p) {
+  const l = $("#loader"); if (!l) return; if (l.classList.contains("hidden")) { l.classList.remove("hidden"); l.style.opacity = 1; }
+  $("#lmsg").textContent = m; if (p != null) $("#lbar").style.width = Math.round(p * 100) + "%";
+}
+function hideLoader() { const l = $("#loader"); if (!l || l.classList.contains("hidden")) return; l.style.opacity = 0; setTimeout(() => { if (l.style.opacity === "0") l.classList.add("hidden"); }, 500); }
 function showScreen(id) { ["msg", "soon", "pin", "intro", "hud"].forEach(s => $("#" + s).classList.toggle("hidden", s !== id)); }
 function message(title, text, acts = []) {
   S.mode = "msg"; hideLoader(); showScreen("msg"); document.body.classList.add("blurred");
@@ -215,7 +218,7 @@ async function gotVault(key, vault) {
   S.key = key; S.vault = vault; S.isOwner = !!vault.owner && vault.owner === myUid();
   S.logo = vault.company?.logo || S.logo; S.hideCredit = !!vault.hideCredit; setLogos();
   if (expired()) { await endScreen(); return; }
-  showScreen(null);
+  showScreen(null); loaderMsg(t("load"), 0.8);
   const needRebuild = (TEMPLATES[vault.template] ? vault.template : "classic") !== S.tpl || !!vault.sideRoom !== S.sideRoom;
   S.tpl = TEMPLATES[vault.template] ? vault.template : "classic"; S.sideRoom = !!vault.sideRoom;
   if (needRebuild) await buildWorld();
