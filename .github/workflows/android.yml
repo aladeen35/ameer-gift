@@ -11,8 +11,6 @@ on:
         default: "1.0.0"
   push:
     tags: ["v*"]
-    branches: ["claude/**"]
-    paths: ["android/**", ".github/workflows/android.yml"]
 
 permissions:
   contents: read
