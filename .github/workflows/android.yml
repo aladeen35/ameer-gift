@@ -35,7 +35,12 @@ jobs:
         run: |
           mkdir -p ~/.bubblewrap
           echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$ANDROID_HOME\"}" > ~/.bubblewrap/config.json
+          # Bubblewrap looks for $ANDROID_HOME/tools/bin/sdkmanager (older SDK layout)
+          sudo ln -sfn "$ANDROID_HOME/cmdline-tools/latest" "$ANDROID_HOME/tools"
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          BT=$(node -p "require('$(npm root -g)/@bubblewrap/cli/node_modules/@bubblewrap/core/dist/lib/androidSdk/AndroidSdkTools.js').BUILD_TOOLS_VERSION" 2>/dev/null || node -p "require('$(npm root -g)/@bubblewrap/core/dist/lib/androidSdk/AndroidSdkTools.js').BUILD_TOOLS_VERSION")
+          echo "build-tools $BT"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "build-tools;$BT" > /dev/null
       - name: Signing key (from secrets, or a new one for the first build)
         id: key
         run: |
