@@ -1,5 +1,4 @@
 // Built-in demo paintings (used by trial museums and the template previews). Drawn on canvas, no image files.
-/* eslint-disable */
 const F_D = "600 %spx 'Reem Kufi','IBM Plex Sans Arabic',Tahoma,sans-serif";
 const F_B = "500 %spx 'IBM Plex Sans Arabic',Tahoma,sans-serif";
 export const fd = s => F_D.replace("%s", s), fb = s => F_B.replace("%s", s);

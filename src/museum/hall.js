@@ -2,13 +2,13 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { Reflector } from "three/examples/jsm/objects/Reflector.js";
-import { canvasTex, floorTextures, wallTexture, radial, wallWash, plaqueCanvas, dedicationCanvas, blobShadow } from "./textures.js";
-import { cv, star } from "./demoArt.js";
+import { canvasTex, floorTextures, wallTexture, radial, wallWash, plaqueCanvas, blobShadow } from "./textures.js";
+import { cv } from "./demoArt.js";
 
 export const TEMPLATES = {
   classic: { wall: "#F3F0EA", trim: "#13294B", trim2: "#1E3D6E", accent: "#C9A24B", floor: "marble-white", ceiling: "#16294A", beams: "#0F1F3A", feature: "cladding", featureA: "#13294B", featureB: "#1A3560", light: 0xffe2b0, chandelier: "crystal", decor: "planters", bg: "#15284A" },
-  garden: { wall: "#EEF1E6", trim: "#3F6B3A", trim2: "#557A45", accent: "#C9A24B", floor: "stone-warm", ceiling: "#E7EEDD", beams: "#C9D6B8", feature: "hedge", featureA: "#3C6B3A", featureB: "#4E7D47", light: 0xfff0cf, chandelier: "lantern", decor: "plants", bg: "#3A5A3A" },
-  wedding: { wall: "#FBF7F3", trim: "#E3C9BE", trim2: "#EBD6CE", accent: "#D4AF6A", floor: "marble-warm", ceiling: "#FFFFFF", beams: "#F1E6DE", feature: "floral", featureA: "#F6EAE4", featureB: "#EFDCD3", light: 0xfff1dc, chandelier: "crystal", decor: "flowers", bg: "#E8D9CF" },
+  garden: { wall: "#E4ECD9", trim: "#3F6B3A", trim2: "#557A45", accent: "#C9A24B", floor: "stone-warm", ceiling: "#E7EEDD", beams: "#C9D6B8", feature: "hedge", featureA: "#3C6B3A", featureB: "#4E7D47", light: 0xfff0cf, chandelier: "lantern", decor: "plants", bg: "#3A5A3A" },
+  wedding: { wall: "#FBF4F0", trim: "#D9B3A6", trim2: "#EBD6CE", accent: "#D4AF6A", floor: "marble-warm", ceiling: "#FFFFFF", beams: "#F1E6DE", feature: "floral", featureA: "#F6EAE4", featureB: "#EFDCD3", light: 0xfff1dc, chandelier: "crystal", decor: "flowers", bg: "#E8D9CF" },
   grad: { wall: "#EEF3FA", trim: "#13294B", trim2: "#1E3D6E", accent: "#4F86C6", floor: "wood", ceiling: "#13294B", beams: "#0E1F3A", feature: "stripes", featureA: "#13294B", featureB: "#4F86C6", light: 0xfff0d8, chandelier: "ring", decor: "pennants", bg: "#13294B" },
 };
 
@@ -52,7 +52,7 @@ export function buildHall({ scene, tpl = "classic", sideRoom = false, quality, r
   const C = TEMPLATES[tpl] || TEMPLATES.classic;
   const root = new THREE.Group(); root.name = "hall"; scene.add(root);
   scene.background = lin(C.bg);
-  const gold = goldMat(), trimM = std(C.trim, { roughness: 0.6 }), accentM = new THREE.MeshStandardMaterial({ color: lin(C.accent), roughness: 0.3, metalness: 0.9 });
+  const gold = goldMat(), trimM = std(C.trim, { roughness: 0.6 });
   const obstacles = [];  // {box:[x0,z0,x1,z1]} | {circle:[x,z,r]}
   const segments = [];   // camera blockers [x0,z0,x1,z1]
   const rooms = [[-RW + 0.45, -RD + 0.45, RW - 0.45, RD - 0.45]];
@@ -230,7 +230,7 @@ function chandelier(root, C, x, y, z, sc, gm, quality, withLight, bulbs) {
     }
     g.add(new THREE.Mesh(mergeGeometries([...armGeos, ...cupGeos]), gm));
     const b = new THREE.Mesh(mergeGeometries(bulbGeos), bulbM); g.add(b); bulbs.push(b);
-    const crystalM = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.04, metalness: 0, transmission: quality.tier === "high" ? 0.6 : 0, thickness: 0.02, ior: 1.6, emissive: lin("#FFF2D0"), emissiveIntensity: 0.25, transparent: true, opacity: 0.92, envMapIntensity: 2 });
+    const crystalM = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.04, metalness: 0, ior: 1.6, emissive: lin("#FFF2D0"), emissiveIntensity: 0.25, transparent: true, opacity: 0.92, envMapIntensity: 2 });
     const drops = []; [[0.72, 36, 2], [0.46, 22, 2], [0.2, 10, 3]].forEach(([r, n, len], ri) => { for (let i = 0; i < n * quality.crystals; i++) { const a = i / (n * quality.crystals) * Math.PI * 2 + ri * 0.2; for (let k = 0; k < len; k++) drops.push([Math.cos(a) * r, -0.06 - k * 0.075 - (i % 2) * 0.04 + (ri === 1 ? 0.34 : 0) - (ri === 2 ? 0.2 : 0), Math.sin(a) * r]); } });
     const inst = new THREE.InstancedMesh(new THREE.OctahedronGeometry(0.022, 0), crystalM, drops.length); const m = new THREE.Matrix4();
     drops.forEach((d, i) => { m.makeScale(1, 1.6, 1); m.setPosition(d[0], d[1], d[2]); inst.setMatrixAt(i, m); }); g.add(inst);

@@ -7,7 +7,7 @@ import { detectTier, PRESETS, saveTier, FpsGuard } from "./quality.js";
 import { makeRenderer, makeEnvironment, Post } from "./render.js";
 import { buildHall, layout, makeFrames, hangPainting, TEMPLATES, RW, RD, RH } from "./hall.js";
 import { buildEntrance } from "./entrance.js";
-import { AvatarLib, Avatar, KIND_H } from "./avatars.js";
+import { AvatarLib, Avatar } from "./avatars.js";
 import { demoPhotos, paintCanvas, setEmptyText } from "./demoArt.js";
 import { canvasTex, dedicationCanvas, plaqueCanvas } from "./textures.js";
 import { Sound } from "./audio.js";
@@ -66,7 +66,6 @@ function message(title, text, acts = []) {
 function fatal(m) { $("#lmsg").textContent = m; const b = document.createElement("button"); b.className = "primary"; b.style.marginTop = "12px"; b.textContent = t("retry"); b.onclick = () => location.reload(); $("#loader .inner")?.append(b); }
 function fadeTo(fn) { const f = $("#fade"); if (reduceMotion()) { fn(); return; } f.style.opacity = 1; setTimeout(() => { fn(); requestAnimationFrame(() => { f.style.opacity = 0; }); }, 650); }
 const dateText = d => { if (!d) return ""; const dt = new Date(String(d).length <= 10 ? d + "T12:00:00" : d); if (isNaN(dt)) return I.num(d); return new Intl.DateTimeFormat(I.lang === "ar" ? "ar-EG" : "en-GB", { year: "numeric", month: "long" }).format(dt); };
-const yearOf = d => I.num(String(d || "").slice(0, 4));
 function setLogos() {
   const company = S.logo; const dark = company || "logo-full-light.png", light = company || "logo-full.png";
   $$("[data-logo]").forEach(i => { i.src = i.closest("#soon,#msg,#loader") && !company ? dark : light; i.alt = company ? (S.vault?.company?.name || "") : "هدايا أمير — Ameer Gift"; });
@@ -174,6 +173,7 @@ async function boot() {
     await fontsReady(); await buildWorld();
     S.photos = demoPhotos(); if (S.sideRoom) S.photos = S.photos.concat(demoPhotos().map(p => ({ ...p, id: p.id + "2", date: p.date.replace(/^\d{4}/, y => String(+y + 10)) })));
     await hangAll(); applyLang();
+    if (params.has("shot")) return shotMode();
     if (openAtMs() > Date.now()) showSoon(); else { S.revealed = true; afterOpen(); }
     return;
   }
@@ -307,7 +307,7 @@ function buildSwatches() {
     OPT[key].forEach(([hex], i) => { const b = document.createElement("button"); b.style.background = hex; b.dataset.key = key; b.dataset.i = i; b.setAttribute("aria-pressed", String(i === me.look[ki]));
       b.onclick = () => { me.look[ki] = i; el.querySelectorAll("button").forEach((x, j) => x.setAttribute("aria-pressed", String(j === i))); my?.applyLook(me.look); savePrefs(); }; el.append(b); }); });
 }
-$$("#who button").forEach(b => b.onclick = () => { me.kind = b.dataset.who; me.variant = 0; $$("#who button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); introSpin = 0; refreshMyAvatar(); });
+$$("#who button").forEach(b => b.onclick = () => { me.kind = b.dataset.who; me.variant = 0; $$("#who button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); refreshMyAvatar(); });
 $$("#height button").forEach(b => b.onclick = () => { me.h = +b.dataset.h; $$("#height button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); my?.setHeightScale(me.h); savePrefs(); });
 $("#prevAv").onclick = () => { const n = variants().length; if (n) { me.variant = (me.variant + n - 1) % n; refreshMyAvatar(); } };
 $("#nextAv").onclick = () => { const n = variants().length; if (n) { me.variant = (me.variant + 1) % n; refreshMyAvatar(); } };
@@ -320,7 +320,7 @@ function showAvatarPhoto() { const b = $("#avbtn"); let i = b.querySelector("img
 $("#name").addEventListener("input", () => { me.name = $("#name").value.trim().slice(0, 18); });
 $("#name").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); enter(); } });
 $("#enter").onclick = () => enter();
-let introSpin = 0, introAuto = true, entering = null;
+let introAuto = true, entering = null;
 
 async function enterIntro() {
   loaderMsg(t("loadAv"), 0.9);
@@ -504,7 +504,6 @@ function stepMuseum(dt) {
 }
 function nearestArt(maxD) { let best = null, bd = maxD; for (const a of [...S.arts, S.ded]) { if (!a) continue; const d = Math.hypot(a.pos.x - P.x, a.pos.z - P.z); if (d < bd) { bd = d; best = a; } } return best; }
 function showView(a) { const v = $("#view"); if (a) { v.textContent = t("view") + (a.ded ? dedicationLines()[0] : artTitle(a)); v.classList.remove("hidden"); } else v.classList.add("hidden"); }
-const spotTargets = [];
 function aimSpots(dt) {
   if (!hall.spots.length) return;
   const list = S.arts.filter(a => !a.onEasel).map(a => ({ a, d: Math.hypot(a.pos.x - P.x, a.pos.z - P.z) })).sort((x, y) => x.d - y.d).slice(0, hall.spots.length);
@@ -632,6 +631,7 @@ function frame() {
   requestAnimationFrame(frame);
   clock.update(); const dt = Math.min(clock.getDelta(), 0.05); if (S.mode === "load" && !sceneHall) return;
   fpsGuard.tick(dt);
+  if (S.mode === "shot") { post.render(sceneHall, camHall); return; }
   if (S.mode === "soon" || S.mode === "pin" || S.mode === "msg" || S.mode === "load") {
     const tt = performance.now() / 1000; const m = reduceMotion() ? 0 : 1;
     camHall.position.set(Math.sin(tt * 0.07) * 3 * m, 2.2 + Math.sin(tt * 0.11) * 0.15 * m, 7.8 + Math.cos(tt * 0.05) * 1.4 * m); camHall.lookAt(Math.sin(tt * 0.05) * 0.8 * m, 1.9, -9);
@@ -656,6 +656,13 @@ function frame() {
     updateGhosts(dt);
   }
   post.render(scene, camera);
+}
+
+/* ---------- still overview used for template thumbnails (museum.html?demo=1&shot=1&tpl=...) ---------- */
+function shotMode() {
+  S.mode = "shot"; $("#loader")?.remove(); showScreen(null); canvas.style.transition = "none"; document.body.classList.remove("blurred");
+  camHall.position.set(4.6, 2.5, 10.8); camHall.lookAt(-0.6, 1.7, -6); camHall.fov = 58; camHall.updateProjectionMatrix();
+  scene = sceneHall; camera = camHall; post.setup(scene, camera); document.body.dataset.ready = "1";
 }
 
 /* ---------- start ---------- */

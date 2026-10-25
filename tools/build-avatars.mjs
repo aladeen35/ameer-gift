@@ -133,7 +133,7 @@ async function buildAvatar(a) {
   tris = 0; for (const m of doc.getRoot().listMeshes()) for (const p of m.listPrimitives()) tris += (p.getIndices()?.getCount() || 0) / 3;
 
   // textures
-  const webp = doc.createExtension(EXTTextureWebP).setRequired(true);
+  doc.createExtension(EXTTextureWebP).setRequired(true);
   for (const mat of doc.getRoot().listMaterials()) {
     const base = mat.getName();
     const isOpacity = /opacity/i.test(base);

@@ -111,7 +111,7 @@ export class Avatar {
     const { clips, meta } = await this.lib.clips(info.g);
     this._clear();
     const obj = SkeletonUtils.clone(gltf.scene);
-    obj.traverse(o => { if (o.isMesh) { o.frustumCulled = false; o.castShadow = this.shadows; o.receiveShadow = false; const ms = Array.isArray(o.material) ? o.material : [o.material]; ms.forEach(m => { m.envMapIntensity = 0.7; if (m.alphaTest) m.alphaToCoverage = true; }); } });
+    obj.traverse(o => { if (o.isMesh) { o.frustumCulled = false; o.castShadow = this.shadows; o.receiveShadow = false; const ms = Array.isArray(o.material) ? o.material : [o.material]; ms.forEach(m => { m.envMapIntensity = 0.7; if (m.alphaTest) { m.transparent = true; m.alphaTest = 0.04; m.depthWrite = true; } }); } });
     this.model.add(obj); this.real = true; this.info = info;
     this.mixer = new THREE.AnimationMixer(obj); this.actions = {}; this.meta = meta;
     const ratio = info.hip && meta.idle?.hip ? info.hip / meta.idle.hip : 1;

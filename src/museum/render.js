@@ -38,10 +38,19 @@ export class Post {
     const rt = new THREE.WebGLRenderTarget(w, h, { type: THREE.HalfFloatType, samples: this.q.post === "high" ? 0 : 0 });
     const c = new EffectComposer(R, rt); c.setPixelRatio(R.getPixelRatio()); c.setSize(w, h);
     c.addPass(new RenderPass(scene, camera));
-    if (this.q.ao && opts.ao !== false) { const ao = new GTAOPass(scene, camera, w, h); ao.blendIntensity = 0.75; ao.updateGtaoMaterial({ radius: 0.35, distanceExponent: 1.5, thickness: 1, scale: 1 }); c.addPass(ao); this.ao = ao; }
+    if (this.q.ao && opts.ao !== false) {
+      const ao = new GTAOPass(scene, camera, w, h); ao.blendIntensity = 0.75; ao.updateGtaoMaterial({ radius: 0.35, distanceExponent: 1.5, thickness: 1, scale: 1 });
+      // glows, labels and light pools are see-through: keep them out of the AO depth/normal pass or they cast grey squares
+      const orig = ao._renderOverride.bind(ao); let skip = [], age = 0;
+      ao._renderOverride = (...args) => {
+        if (age-- <= 0) { skip = []; scene.traverse(o => { const m = o.material; if (o.isSprite || (m && !Array.isArray(m) && m.transparent && !m.depthWrite) || (m && m.blending === THREE.AdditiveBlending)) skip.push(o); }); age = 90; }
+        const was = skip.map(o => o.visible); skip.forEach(o => { o.visible = false; }); orig(...args); skip.forEach((o, i) => { o.visible = was[i]; });
+      };
+      c.addPass(ao); this.ao = ao;
+    }
     if (this.q.bloom && opts.bloom !== false && !/[?&]bloom=0/.test(location.search)) { const b = new UnrealBloomPass(new THREE.Vector2(w / 2, h / 2), 0.35, 0.3, 1.9); c.addPass(b); this.bloom = b; }
     c.addPass(new OutputPass());
-    if (/[?&]aa=0/.test(location.search)) {} else if (this.q.aa === "smaa") c.addPass(new SMAAPass(w * R.getPixelRatio(), h * R.getPixelRatio()));
+    if (/[?&]aa=0/.test(location.search)) { /* no anti-aliasing (debug) */ } else if (this.q.aa === "smaa") c.addPass(new SMAAPass(w * R.getPixelRatio(), h * R.getPixelRatio()));
     else if (this.q.aa === "fxaa") { const f = new ShaderPass(FXAAShader); f.material.uniforms.resolution.value.set(1 / (w * R.getPixelRatio()), 1 / (h * R.getPixelRatio())); c.addPass(f); this.fxaa = f; }
     this.composer = c;
   }

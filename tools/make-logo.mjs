@@ -2,7 +2,6 @@
 // Navy ink becomes white, gold stays gold, the white background becomes transparent.
 import sharp from "sharp";
 
-const NAVY = [19, 41, 75];
 async function convert(src, out) {
   const { data, info } = await sharp(src).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
   for (let i = 0; i < data.length; i += 4) {
