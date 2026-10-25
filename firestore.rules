@@ -57,7 +57,10 @@ service cloud.firestore {
       allow update: if isAdmin()
         || (owns() && resource.data.status in ['draft', 'rejected']
             && request.resource.data.status in ['draft', 'pending']
-            && request.resource.data.owner == resource.data.owner);
+            && request.resource.data.owner == resource.data.owner)
+        // after activation the owner may keep the order in sync with the words they edit in the museum
+        || (owns() && resource.data.status == 'active'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'recipient', 'sender', 'dedication', 'music', 'openAt', 'updatedAt']));
       allow delete: if isAdmin() || (owns() && resource.data.status == 'draft');
 
       function galleryOwner() { return get(/databases/$(database)/documents/galleries/$(gid)).data.owner; }
@@ -75,7 +78,8 @@ service cloud.firestore {
       allow get: if true;
       allow list: if isAdmin();
       allow create: if isStaff();
-      allow update: if isAdmin() || (signedIn() && resource.data.owner == uid() && request.resource.data.owner == resource.data.owner);
+      allow update: if isAdmin() || (signedIn() && resource.data.owner == uid()
+                       && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'recipient', 'sender', 'openAt']));
       allow delete: if isAdmin();
     }
 
@@ -87,19 +91,40 @@ service cloud.firestore {
       allow get: if isOpen(resource.data) || vOwner(resource.data) || isStaff();
       allow list: if false;
       allow create: if isStaff();
-      allow update: if isAdmin() || (vOwner(resource.data) && request.resource.data.owner == resource.data.owner
-                                     && request.resource.data.status == resource.data.status && request.resource.data.expiresAt == resource.data.expiresAt);
+      // the owner may edit the words, music and opening time, nothing that changes the price or the package
+      allow update: if isAdmin() || (vOwner(resource.data)
+                       && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'recipient', 'sender', 'dedication', 'music', 'openAt', 'updatedAt']));
       allow delete: if isAdmin();
       match /photos/{pid} {
         allow read: if isOpen(v()) || vOwner(v()) || isStaff();
-        allow write: if isAdmin() || vOwner(v());
+        allow create, delete: if isAdmin();
+        allow update: if isAdmin() || (vOwner(v()) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'caption', 'date']));
       }
-      // Each visitor keeps their own likes and comments; the museum owner can remove any comment
+      // Each visitor keeps their own likes and comments; the museum owner and admins can remove any comment
       match /social/{u} {
+        function okSocial() {
+          let d = request.resource.data;
+          return d.keys().hasOnly(['name', 'photo', 'likes', 'comments', 'at'])
+            && d.name is string && d.name.size() <= 18 && d.photo is string && d.photo.size() <= 60000
+            && d.likes is map && d.likes.size() <= 60 && d.comments is list && d.comments.size() <= 60;
+        }
         allow read: if isOpen(v()) || vOwner(v()) || isAdmin();
-        allow create, update: if signedIn() && ((uid() == u && isOpen(v())) || vOwner(v()));
+        allow create, update: if signedIn() && okSocial() && ((uid() == u && isOpen(v())) || vOwner(v()) || isAdmin());
         allow delete: if signedIn() && (uid() == u || vOwner(v()) || isAdmin());
       }
+    }
+
+    // Visit counter per museum (anyone signed in, even anonymously, adds exactly one)
+    match /visits/{gid} {
+      allow read: if isAdmin() || (signedIn() && get(/databases/$(database)/documents/galleries/$(gid)).data.owner == uid());
+      allow create: if signedIn() && request.resource.data.keys().hasOnly(['count', 'last']) && request.resource.data.count == 1;
+      allow update: if signedIn() && request.resource.data.keys().hasOnly(['count', 'last']) && request.resource.data.count == resource.data.count + 1;
+    }
+
+    // Who did what in the admin panel (activations, rejections, trials, price changes)
+    match /audit/{id} {
+      allow create: if isStaff() && request.resource.data.by == uid();
+      allow read: if isAdmin();
     }
 
     // One trial per phone number (the document id is the phone)

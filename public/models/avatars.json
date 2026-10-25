@@ -1,0 +1,221 @@
+{
+ "generated": "2026-10-25T00:46:27.284Z",
+ "avatars": [
+  {
+   "id": "m-thobe-shemagh",
+   "kind": "man",
+   "g": "m",
+   "file": "models/avatars/m-thobe-shemagh.glb",
+   "tris": 6732,
+   "kb": 424,
+   "hip": 0.895,
+   "src": "Adults/Male_Adult_19"
+  },
+  {
+   "id": "m-thobe-ghutra",
+   "kind": "man",
+   "g": "m",
+   "file": "models/avatars/m-thobe-ghutra.glb",
+   "tris": 6682,
+   "kb": 435,
+   "hip": 0.895,
+   "src": "Adults/Male_Adult_21"
+  },
+  {
+   "id": "m-thobe-kufi",
+   "kind": "man",
+   "g": "m",
+   "file": "models/avatars/m-thobe-kufi.glb",
+   "tris": 7292,
+   "kb": 303,
+   "hip": 0.895,
+   "src": "Adults/Male_Adult_15"
+  },
+  {
+   "id": "m-shirt-blue",
+   "kind": "man",
+   "g": "m",
+   "file": "models/avatars/m-shirt-blue.glb",
+   "tris": 7364,
+   "kb": 394,
+   "hip": 0.895,
+   "src": "Adults/Male_Adult_08"
+  },
+  {
+   "id": "m-shirt-khaki",
+   "kind": "man",
+   "g": "m",
+   "file": "models/avatars/m-shirt-khaki.glb",
+   "tris": 6842,
+   "kb": 317,
+   "hip": 0.895,
+   "src": "Adults/Male_Adult_14"
+  },
+  {
+   "id": "f-hijab-white",
+   "kind": "woman",
+   "g": "f",
+   "file": "models/avatars/f-hijab-white.glb",
+   "tris": 6992,
+   "kb": 436,
+   "hip": 0.923,
+   "src": "Adults/Female_Adult_06"
+  },
+  {
+   "id": "f-abaya-black",
+   "kind": "woman",
+   "g": "f",
+   "file": "models/avatars/f-abaya-black.glb",
+   "tris": 6460,
+   "kb": 299,
+   "hip": 0.923,
+   "src": "Adults/Female_Adult_10"
+  },
+  {
+   "id": "f-coat-grey",
+   "kind": "woman",
+   "g": "f",
+   "file": "models/avatars/f-coat-grey.glb",
+   "tris": 9032,
+   "kb": 492,
+   "hip": 0.923,
+   "src": "Adults/Female_Adult_09"
+  },
+  {
+   "id": "f-coat-beige",
+   "kind": "woman",
+   "g": "f",
+   "file": "models/avatars/f-coat-beige.glb",
+   "tris": 8724,
+   "kb": 595,
+   "hip": 0.923,
+   "src": "Adults/Female_Adult_14"
+  },
+  {
+   "id": "b-blue",
+   "kind": "boy",
+   "g": "m",
+   "file": "models/avatars/b-blue.glb",
+   "tris": 6660,
+   "kb": 319,
+   "hip": 0.707,
+   "src": "Children/Male_Child_01"
+  },
+  {
+   "id": "b-orange",
+   "kind": "boy",
+   "g": "m",
+   "file": "models/avatars/b-orange.glb",
+   "tris": 7310,
+   "kb": 311,
+   "hip": 0.707,
+   "src": "Children/Male_Child_02"
+  },
+  {
+   "id": "g-hijab-green",
+   "kind": "girl",
+   "g": "f",
+   "file": "models/avatars/g-hijab-green.glb",
+   "tris": 6870,
+   "kb": 293,
+   "hip": 0.757,
+   "src": "Children/Female_Child_02"
+  },
+  {
+   "id": "g-pink",
+   "kind": "girl",
+   "g": "f",
+   "file": "models/avatars/g-pink.glb",
+   "tris": 7102,
+   "kb": 308,
+   "hip": 0.757,
+   "src": "Children/Female_Child_01"
+  }
+ ],
+ "anims": {
+  "m": {
+   "g": "m",
+   "file": "models/anims-m.glb",
+   "kb": 357,
+   "clips": {
+    "idle": {
+     "speed": 0,
+     "hip": 0.895,
+     "duration": 7.967
+    },
+    "look": {
+     "speed": 0,
+     "hip": 0.894,
+     "duration": 4.633
+    },
+    "walk": {
+     "speed": 1.402,
+     "hip": 0.877,
+     "duration": 1.067
+    },
+    "jog": {
+     "speed": 2.411,
+     "hip": 0.863,
+     "duration": 0.767
+    },
+    "wave": {
+     "speed": 0,
+     "hip": 0.898,
+     "duration": 2.833
+    },
+    "clap": {
+     "speed": 0,
+     "hip": 0.895,
+     "duration": 4.967
+    },
+    "sit": {
+     "speed": 0,
+     "hip": 0.594,
+     "duration": 9.967
+    }
+   }
+  },
+  "f": {
+   "g": "f",
+   "file": "models/anims-f.glb",
+   "kb": 350,
+   "clips": {
+    "idle": {
+     "speed": 0,
+     "hip": 0.919,
+     "duration": 7.967
+    },
+    "look": {
+     "speed": 0,
+     "hip": 0.92,
+     "duration": 4.467
+    },
+    "walk": {
+     "speed": 1.295,
+     "hip": 0.893,
+     "duration": 1.233
+    },
+    "jog": {
+     "speed": 2.269,
+     "hip": 0.9,
+     "duration": 0.833
+    },
+    "wave": {
+     "speed": 0,
+     "hip": 0.914,
+     "duration": 5.533
+    },
+    "clap": {
+     "speed": 0,
+     "hip": 0.921,
+     "duration": 4.967
+    },
+    "sit": {
+     "speed": 0,
+     "hip": 0.611,
+     "duration": 9.967
+    }
+   }
+  }
+ }
+}

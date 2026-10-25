@@ -1,24 +1,24 @@
 // هدايا أمير — shared setup (Firebase + helpers)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
   createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail,
-  onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  onAuthStateChanged, signOut, updateProfile, signInAnonymously } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, collection, query, where,
-  orderBy, getDocs, onSnapshot, serverTimestamp, Timestamp, writeBatch, increment, limit } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  orderBy, getDocs, onSnapshot, serverTimestamp, Timestamp, writeBatch, increment, limit, deleteField, arrayUnion } from "firebase/firestore";
+import { CONFIG } from "./config.js";
 
-export const firebaseConfig = {
-  apiKey: "AIzaSyCI9WPKvYbDmac8zXeatAivmVBGyS-CtIc",
-  authDomain: "ameer-gift.firebaseapp.com",
-  projectId: "ameer-gift",
-  storageBucket: "ameer-gift.firebasestorage.app",
-  messagingSenderId: "276474821835",
-  appId: "1:276474821835:web:2c3bba0be6692da6746f4e"
-};
+export const firebaseConfig = CONFIG.firebase;
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const fs = { doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, collection, query, where, orderBy, getDocs, onSnapshot, serverTimestamp, Timestamp, writeBatch, increment, limit };
-export const au = { onAuthStateChanged, signOut, updateProfile, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail };
+export const fs = { doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, collection, query, where, orderBy, getDocs, onSnapshot, serverTimestamp, Timestamp, writeBatch, increment, limit, deleteField, arrayUnion };
+export const au = { onAuthStateChanged, signOut, updateProfile, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signInAnonymously };
+
+// Optional App Check (reCAPTCHA v3, free on the Spark plan). Turned on only when a site key is set in config.js
+if (CONFIG.appCheckSiteKey) {
+  import("firebase/app-check").then(({ initializeAppCheck, ReCaptchaV3Provider }) =>
+    initializeAppCheck(app, { provider: new ReCaptchaV3Provider(CONFIG.appCheckSiteKey), isTokenAutoRefreshEnabled: true })).catch(() => {});
+}
 
 // Google sign-in: popup first, redirect if the browser blocks popups
 export async function googleSignIn() {
@@ -103,6 +103,8 @@ export const DEFAULT_PRICING = {
     { id: "company", nameAr: "شركات", nameEn: "Company", visitors: 20, months: 12, business: true, prices: { USD: 60, SAR: 225, SDG: 150000 } }
   ],
   sideRoom: { USD: 8, SAR: 30, SDG: 20000 },
+  hideCredit: { USD: 10, SAR: 38, SDG: 25000 },
+  contact: { whatsapp: "" },
   bank: { name: "بنكك", account: "", holder: "", note: "" }
 };
 export async function loadPricing() {
@@ -111,7 +113,8 @@ export async function loadPricing() {
 }
 export function priceOf(pr, g) {
   const pk = pr.packages.find(p => p.id === g.packageId); if (!pk) return 0;
-  let v = Number(pk.prices?.[g.currency] || 0); if (g.sideRoom) v += Number(pr.sideRoom?.[g.currency] || 0); return v;
+  let v = Number(pk.prices?.[g.currency] || 0); if (g.sideRoom) v += Number(pr.sideRoom?.[g.currency] || 0);
+  if (g.hideCredit && g.type === "company") v += Number(pr.hideCredit?.[g.currency] || 0); return v;
 }
 export function applyDiscount(total, d, cur) {
   if (!d) return { total, off: 0 };
@@ -138,7 +141,7 @@ export function authError(e, lang) {
 }
 
 // Installable app (PWA)
-if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register(new URL("sw.js", document.baseURI)).catch(() => {}));
 export let installPrompt = null;
 addEventListener("beforeinstallprompt", e => { e.preventDefault(); installPrompt = e; dispatchEvent(new Event("ag-installable")); });
 export async function promptInstall() { if (!installPrompt) return false; installPrompt.prompt(); const r = await installPrompt.userChoice; installPrompt = null; return r.outcome === "accepted"; }

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>شكر وتقدير — Credits</title>
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Reem+Kufi:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/src/style.css">
+<style>
+.cr{display:grid;gap:12px;margin:20px 0 40px}
+.cr .card h3{font-size:17px;margin-bottom:4px}
+.cr .card p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.7}
+.cr .lic{display:inline-block;font-size:12.5px;font-weight:600;color:var(--gold);margin-top:6px;direction:ltr}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap"><a class="logo-chip" href="index.html"><img class="logo" src="logo-full.png" alt="هدايا أمير — Ameer Gift"></a><span class="grow"></span><button class="iconbtn" id="langBtn">EN</button></div></header>
+<main class="wrap">
+  <h1 style="margin-top:24px" id="h"></h1>
+  <p class="muted" id="p"></p>
+  <div class="cr" id="list"></div>
+</main>
+<script type="module">
+const L = [
+  ["Microsoft Rocketbox Avatar Library", "Microsoft Research, Rocketbox", "MIT", "https://github.com/microsoft/Microsoft-Rocketbox", "الشخصيات الواقعية وحركاتها الملتقطة", "Realistic avatars and motion-capture clips"],
+  ["Ultimate Modular Men / Women", "Quaternius", "CC0 1.0", "https://quaternius.com", "الشخصيات الخفيفة للأجهزة البسيطة", "Light characters for low-end phones"],
+  ["three.js", "three.js authors", "MIT", "https://github.com/mrdoob/three.js", "محرك الرسوم ثلاثية الأبعاد، ومؤثرات الإضاءة والظلال", "3D engine, lighting and post effects"],
+  ["meshoptimizer", "Arseny Kapoulkine", "MIT", "https://github.com/zeux/meshoptimizer", "ضغط النماذج وتبسيطها", "Mesh compression and simplification"],
+  ["glTF-Transform", "Don McCurdy", "MIT", "https://github.com/donmccurdy/glTF-Transform", "تجهيز النماذج للويب", "Preparing models for the web"],
+  ["Firebase JS SDK", "Google", "Apache-2.0", "https://github.com/firebase/firebase-js-sdk", "الحسابات وقاعدة البيانات والزوار المباشرون", "Accounts, database and live visitors"],
+  ["Vite", "Vite team", "MIT", "https://github.com/vitejs/vite", "بناء الموقع", "Site build"],
+  ["sharp", "Lovell Fuller", "Apache-2.0", "https://github.com/lovell/sharp", "تجهيز الصور والشعارات", "Image and logo processing"],
+  ["Reem Kufi", "Khaled Hosny, Santiago Orozco", "OFL-1.1", "https://fonts.google.com/specimen/Reem+Kufi", "خط العناوين", "Display font"],
+  ["IBM Plex Sans Arabic", "IBM", "OFL-1.1", "https://fonts.google.com/specimen/IBM+Plex+Sans+Arabic", "خط النصوص", "Body font"],
+  ["Bubblewrap", "Google Chrome Labs", "Apache-2.0", "https://github.com/GoogleChromeLabs/bubblewrap", "تطبيق أندرويد", "Android app packaging"],
+];
+let lang = localStorage.getItem("ag-lang") || "ar";
+function render() {
+  document.documentElement.lang = lang; document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+  document.getElementById("h").textContent = lang === "ar" ? "شكر وتقدير" : "Credits";
+  document.getElementById("p").textContent = lang === "ar" ? "هدايا أمير مبنية بفضل هذه المكتبات والأعمال المفتوحة. شكرًا لأصحابها." : "Ameer Gift is built with these open libraries and assets. Thank you to their authors.";
+  document.getElementById("langBtn").textContent = lang === "ar" ? "EN" : "عربي";
+  const box = document.getElementById("list"); box.replaceChildren();
+  for (const [n, by, lic, url, ar, en] of L) {
+    const c = document.createElement("div"); c.className = "card";
+    c.innerHTML = `<h3></h3><p></p><a class="lic" target="_blank" rel="noopener"></a>`;
+    c.querySelector("h3").textContent = n; c.querySelector("p").textContent = (lang === "ar" ? ar : en) + " · " + by;
+    const a = c.querySelector("a"); a.textContent = lic + " ↗"; a.href = url; box.append(c);
+  }
+}
+document.getElementById("langBtn").onclick = () => { lang = lang === "ar" ? "en" : "ar"; localStorage.setItem("ag-lang", lang); render(); };
+render();
+</script>
+</body>
+</html>

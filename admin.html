@@ -11,7 +11,7 @@
 <meta name="theme-color" content="#13294B">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Reem+Kufi:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/src/style.css">
 <style>
 .tabs{display:flex;gap:6px;overflow-x:auto;padding:12px 0 4px;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -75,14 +75,17 @@
 
 <script type="module">
 import { auth, db, fs, au, googleSignIn, $, $$, el, toast, normalizePhone, phoneOk, fmtNum, CURRENCIES, money, randomId, randomPin, vaultKey,
-  DEFAULT_PRICING, loadPricing, museumUrl, waShare, authError } from "./shared.js";
+  DEFAULT_PRICING, loadPricing, museumUrl, waShare, authError } from "/src/shared.js";
 
 let lang = localStorage.getItem("ag-lang") || (/^ar/i.test(navigator.language) ? "ar" : "en");
 const T = {
  ar:{bar:"لوحة الإدارة",loginH:"دخول فريق هدايا أمير",google:"الدخول بحساب Google",email:"البريد الإلكتروني",password:"كلمة المرور",signin:"دخول",out:"خروج",
   bootH:"أهلًا بك، أنت أول من يدخل",bootP:"فعّل حسابك كمدير رئيسي. بعد ذلك تضيف بقية الفريق من تبويب «الفريق».",bootBtn:"تفعيل حسابي كمدير رئيسي",
   reqH:"حسابك ليس ضمن الفريق بعد",reqP:"أرسل طلب انضمام، وسيفعّله المدير.",reqBtn:"إرسال طلب انضمام",reqSent:"تم إرسال طلبك، انتظر التفعيل.",
-  tabs:{dash:"الأرقام",orders:"الطلبات",trials:"التجارب",pricing:"الأسعار",codes:"أكواد الخصم",feedback:"الآراء والشكاوى",team:"الفريق"},
+  tabs:{dash:"الأرقام",orders:"الطلبات",trials:"التجارب",pricing:"الأسعار",codes:"أكواد الخصم",feedback:"الآراء والشكاوى",comments:"التعليقات",log:"السجل",team:"الفريق"},
+  visits:"زيارات المعارض",topVisited:"الأكثر زيارة",exportCsv:"تصدير الطلبات CSV",hideCredit:"إخفاء «من هدايا أمير» (مميزة)",template:"القالب",contact:"واتساب التواصل (يظهر عند انتهاء التجربة)",hidePrice:"سعر إخفاء عبارة هدايا أمير",
+  modH:"تعليقات الزوار في كل المعارض",modP:"تُعرض أحدث التعليقات في المعارض المفعّلة. الحذف نهائي.",loadMore:"تحميل",logH:"سجل العمليات",act:{activate:"تفعيل",reject:"رفض",trial:"تجربة",pricing:"تعديل الأسعار",code:"كود خصم",deleteComment:"حذف تعليق",role:"صلاحيات"},
+  tplName:{classic:"الكلاسيكي الذهبي",garden:"الحديقة",wedding:"الزفاف",grad:"التخرج"},
   galleries:"كل المعارض",pending:"بانتظار التحقق",active:"مفعّلة",drafts:"مسودات",rejected:"مرفوضة",revenue:"المبيعات",thisMonth:"هذا الشهر",trials:"تجارب مرسلة",converted:"تجارب تحولت لشراء",complaints:"شكاوى مفتوحة",feedbacks:"كل الآراء",last14:"الطلبات المرسلة آخر ١٤ يومًا",companies:"معارض شركات",
   st:{draft:"مسودة",pending:"بانتظار التحقق",active:"مفعّل",rejected:"مرفوض"},all:"الكل",customer:"العميل",phone:"الجوال",pkg:"الباقة",visitors:"الزوار",rooms:"القاعات",photos:"الصور",price:"المبلغ",code:"كود الخصم",opens:"الفتح",now:"فور التفعيل",receipt:"الإشعار",noReceipt:"لا يوجد إشعار",
   activate:"تأكيد الدفع وتفعيل",reject:"رفض",rejectQ:"سبب الرفض (يظهر للعميل):",activating:"جارٍ التفعيل…",activated:"تم التفعيل",sendCust:"إرسال للعميل واتساب",link:"الرابط",pinL:"رمز الدخول",copy:"نسخ",copied:"تم النسخ",none:"لا توجد عناصر",
@@ -94,7 +97,10 @@ const T = {
  en:{bar:"Admin",loginH:"Ameer Gift team sign-in",google:"Sign in with Google",email:"Email",password:"Password",signin:"Sign in",out:"Sign out",
   bootH:"Welcome, you are the first one here",bootP:"Activate your account as the main admin. Then add the rest of the team from the Team tab.",bootBtn:"Make me the main admin",
   reqH:"Your account is not on the team yet",reqP:"Send a join request and an admin will approve it.",reqBtn:"Send join request",reqSent:"Request sent, wait for approval.",
-  tabs:{dash:"Numbers",orders:"Orders",trials:"Trials",pricing:"Pricing",codes:"Discount codes",feedback:"Feedback",team:"Team"},
+  tabs:{dash:"Numbers",orders:"Orders",trials:"Trials",pricing:"Pricing",codes:"Discount codes",feedback:"Feedback",comments:"Comments",log:"Log",team:"Team"},
+  visits:"Museum visits",topVisited:"Most visited",exportCsv:"Export orders CSV",hideCredit:"Hide \"by Ameer Gift\" (premium)",template:"Template",contact:"Contact WhatsApp (shown when a trial ends)",hidePrice:"Price to hide the Ameer Gift credit",
+  modH:"Visitor comments in all museums",modP:"Latest comments in active museums. Deleting is permanent.",loadMore:"Load",logH:"Activity log",act:{activate:"Activation",reject:"Rejection",trial:"Trial",pricing:"Price change",code:"Discount code",deleteComment:"Comment deleted",role:"Roles"},
+  tplName:{classic:"Classic Gold",garden:"Garden",wedding:"Wedding",grad:"Graduation"},
   galleries:"All museums",pending:"Awaiting check",active:"Active",drafts:"Drafts",rejected:"Rejected",revenue:"Sales",thisMonth:"This month",trials:"Trials sent",converted:"Trials that bought",complaints:"Open complaints",feedbacks:"All feedback",last14:"Orders sent in the last 14 days",companies:"Company museums",
   st:{draft:"Draft",pending:"Awaiting check",active:"Active",rejected:"Rejected"},all:"All",customer:"Customer",phone:"Mobile",pkg:"Package",visitors:"Visitors",rooms:"Halls",photos:"Photos",price:"Amount",code:"Discount code",opens:"Opens",now:"On activation",receipt:"Receipt",noReceipt:"No receipt",
   activate:"Confirm payment & activate",reject:"Reject",rejectQ:"Rejection reason (shown to the customer):",activating:"Activating…",activated:"Activated",sendCust:"Send to customer on WhatsApp",link:"Link",pinL:"Access code",copy:"Copy",copied:"Copied",none:"Nothing here",
@@ -137,13 +143,15 @@ au.onAuthStateChanged(auth, async u => {
 });
 
 /* ---------- tabs ---------- */
-function allowedTabs() { return role === "admin" ? ["dash", "orders", "trials", "pricing", "codes", "feedback", "team"] : ["trials"]; }
+function allowedTabs() { return role === "admin" ? ["dash", "orders", "trials", "pricing", "codes", "feedback", "comments", "log", "team"] : ["trials"]; }
 function renderTabs() { $("#tabs").replaceChildren(...allowedTabs().map(k => { const b = el("button", { "aria-pressed": String(tab === k), onclick: () => { tab = k; renderTabs(); render(); } }, t("tabs")[k]);
   if (k === "orders" && cache.pendingCount) b.append(el("span", { class: "badge", text: fmtNum(cache.pendingCount, lang) })); return b; })); }
 async function render() { const p = $("#pane"); p.replaceChildren(el("div", { class: "center" }, el("span", { class: "spinner" })));
-  try { await ({ dash, orders, trials, pricing: pricingTab, codes, feedback, team })[tab](p); } catch (e) { console.error(e); p.replaceChildren(el("p", { class: "muted", text: (e.code === "permission-denied" ? t("noPerm") : t("err")) + " " + (e.code || "") })); } }
+  try { await ({ dash, orders, trials, pricing: pricingTab, codes, feedback, comments, log: logTab, team })[tab](p); } catch (e) { console.error(e); p.replaceChildren(el("p", { class: "muted", text: (e.code === "permission-denied" ? t("noPerm") : t("err")) + " " + (e.code || "") })); } }
 async function getAll(path) { const s = await fs.getDocs(fs.collection(db, path)); return s.docs.map(d => ({ id: d.id, ...d.data() })); }
 const ms = x => x?.toMillis?.() || 0;
+// every sensitive action leaves a line in audit/ (who, what, which museum)
+async function audit(action, ref, extra = {}) { try { await fs.addDoc(fs.collection(db, "audit"), { action, ref: ref || "", by: user.uid, byName: user.displayName || user.email || "", at: fs.serverTimestamp(), ...extra }); } catch (e) { console.warn("audit", e); } }
 function fmtDate(x, withTime = true) { const d = x?.toDate ? x.toDate() : (x instanceof Date ? x : null); if (!d) return "—";
   return new Intl.DateTimeFormat(lang === "ar" ? "ar-EG" : "en-GB", withTime ? { dateStyle: "medium", timeStyle: "short" } : { dateStyle: "medium" }).format(d); }
 async function copy(s) { try { await navigator.clipboard.writeText(s); toast(t("copied")); } catch (e) { prompt("", s); } }
@@ -152,7 +160,9 @@ const sec = (title, ...kids) => el("div", { class: "card stack", style: "margin-
 
 /* ---------- dashboard ---------- */
 async function dash(p) {
-  const [gs, fb, tr] = await Promise.all([getAll("galleries"), getAll("feedback"), getAll("trials").catch(() => [])]);
+  const [gs, fb, tr, vs] = await Promise.all([getAll("galleries"), getAll("feedback"), getAll("trials").catch(() => []), getAll("visits").catch(() => [])]);
+  const totalVisits = vs.reduce((a, v) => a + (v.count || 0), 0);
+  const titleOf = id => (gs.find(g => g.id === id)?.title) || id; const top = vs.slice().sort((a, b) => (b.count || 0) - (a.count || 0)).slice(0, 5);
   const by = s => gs.filter(g => g.status === s); cache.pendingCount = by("pending").length; renderTabs();
   const act = by("active"); const rev = {}, revM = {}; const m0 = new Date(); m0.setDate(1); m0.setHours(0, 0, 0, 0);
   for (const g of act) { rev[g.currency] = (rev[g.currency] || 0) + (g.price || 0); if (ms(g.activatedAt) >= m0.getTime()) revM[g.currency] = (revM[g.currency] || 0) + (g.price || 0); }
@@ -162,10 +172,19 @@ async function dash(p) {
   const counts = days.map(d => gs.filter(g => { const s = ms(g.submittedAt); return s >= d && s < d + 864e5; }).length); const mx = Math.max(1, ...counts);
   p.replaceChildren(
     el("div", { class: "stats" }, stat(fmtNum(cache.pendingCount, lang), t("pending"), true), stat(fmtNum(act.length, lang), t("active")), stat(fmtNum(gs.length, lang), t("galleries")), stat(fmtNum(by("draft").length, lang), t("drafts")),
-      stat(fmtNum(tr.length, lang), t("trials")), stat(fmtNum(conv, lang), t("converted")), stat(fmtNum(fb.filter(f => f.type === "complaint" && !f.resolved).length, lang), t("complaints"), true), stat(fmtNum(gs.filter(g => g.type === "company").length, lang), t("companies"))),
+      stat(fmtNum(tr.length, lang), t("trials")), stat(fmtNum(conv, lang), t("converted")), stat(fmtNum(fb.filter(f => f.type === "complaint" && !f.resolved).length, lang), t("complaints"), true), stat(fmtNum(gs.filter(g => g.type === "company").length, lang), t("companies")), stat(fmtNum(totalVisits, lang), t("visits"))),
     el("div", { class: "card stack", style: "margin-top:14px" }, el("div", { class: "line" }, el("b", { text: t("revenue") }), el("span", { text: fmtRev(rev) })), el("div", { class: "line" }, el("span", { class: "muted", text: t("thisMonth") }), el("span", { text: fmtRev(revM) }))),
     el("div", { class: "card", style: "margin-top:14px" }, el("b", { text: t("last14") }), el("div", { class: "bars" }, ...counts.map(c => el("i", { style: `height:${c / mx * 100}%`, title: String(c) }))),
-      el("div", { class: "barlbl" }, el("span", { text: fmtDate(new Date(days[0]), false) }), el("span", { text: fmtDate(new Date(days[13]), false) }))));
+      el("div", { class: "barlbl" }, el("span", { text: fmtDate(new Date(days[0]), false) }), el("span", { text: fmtDate(new Date(days[13]), false) }))),
+    top.length ? el("div", { class: "card stack", style: "margin-top:14px" }, el("b", { text: t("topVisited") }), ...top.map(v => el("div", { class: "line" }, el("span", { text: titleOf(v.id) }), el("b", { text: fmtNum(v.count || 0, lang) })))) : "",
+    el("button", { class: "btn ghost block", style: "margin-top:14px", text: t("exportCsv"), onclick: () => exportCsv(gs, vs) }));
+}
+function exportCsv(gs, vs) {
+  const cols = ["id", "status", "type", "title", "recipient", "sender", "name", "email", "phone", "packageId", "visitors", "sideRoom", "template", "currency", "price", "discountCode", "discountOff", "photos", "openAt", "submittedAt", "activatedAt", "visits"];
+  const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`; const d = x => x?.toDate ? x.toDate().toISOString() : "";
+  const rows = gs.map(g => [g.id, g.status, g.type, g.title, g.recipient, g.sender, g.contact?.name, g.contact?.email, g.contact?.phone, g.packageId, g.visitors, g.sideRoom ? 1 : 0, g.template, g.currency, g.price, g.discountCode, g.discountOff, g.photoCount, d(g.openAt), d(g.submittedAt), d(g.activatedAt), (vs.find(v => v.id === g.id)?.count) || 0].map(q).join(","));
+  const blob = new Blob(["\ufeff" + [cols.join(","), ...rows].join("\r\n")], { type: "text/csv;charset=utf-8" });
+  const a = el("a", { href: URL.createObjectURL(blob), download: `ameer-gift-orders-${new Date().toISOString().slice(0, 10)}.csv` }); document.body.append(a); a.click(); a.remove();
 }
 
 /* ---------- orders ---------- */
@@ -184,7 +203,7 @@ async function orderCard(g, pr, p) {
   const ph = g.contact?.phone || "";
   const kv = el("dl", { class: "kv" }, ...[[t("customer"), [g.contact?.name, g.contact?.email].filter(Boolean).join(" · ") || "—"], [t("phone"), ph ? "+" + ph : "—"],
     [t("pkg"), (lang === "ar" ? pk.nameAr : pk.nameEn) || g.packageId], [t("visitors"), fmtNum(g.visitors, lang)], [t("rooms"), fmtNum(g.sideRoom ? 2 : 1, lang)], [t("photos"), fmtNum(g.photoCount || 0, lang)],
-    [t("price"), money(g.price || 0, g.currency, lang)], [t("code"), g.discountCode || "—"], [t("opens"), g.openAt ? fmtDate(g.openAt) : t("now")]].flatMap(([k, v]) => [el("dt", { text: k }), el("dd", { text: v })]));
+    [t("price"), money(g.price || 0, g.currency, lang)], [t("code"), g.discountCode || "—"], [t("opens"), g.openAt ? fmtDate(g.openAt) : t("now")], [t("template"), t("tplName")[g.template] || g.template || "—"]].flatMap(([k, v]) => [el("dt", { text: k }), el("dd", { text: v })]));
   const c = el("div", { class: "card ocard" }, el("div", { class: "top" }, el("div", {}, el("h3", { style: "font-size:18px", text: g.title }), el("p", { class: "small muted", style: "margin:0", text: `${g.sender} ← ${g.recipient}` })),
     el("span", { class: "chip " + chip, text: t("st")[g.status] })), kv);
   if (g.company?.logo) c.append(el("img", { src: g.company.logo, alt: g.company.name || "", style: "max-height:56px;max-width:180px;background:#fff;border-radius:8px;padding:4px" }));
@@ -192,11 +211,18 @@ async function orderCard(g, pr, p) {
   else if (g.status === "pending") c.append(el("p", { class: "small", style: "margin:0;color:var(--bad)", text: t("noReceipt") }));
   if (g.rejectReason && g.status === "rejected") c.append(el("p", { class: "small", style: "margin:0;color:var(--bad)", text: g.rejectReason }));
   const acts = el("div", { class: "acts" });
+  if (g.type === "company" && (g.status === "pending" || g.status === "active")) {
+    const cb = el("input", { type: "checkbox" }); cb.checked = !!g.hideCredit;
+    cb.onchange = async () => { try { await fs.updateDoc(fs.doc(db, "galleries", g.id), { hideCredit: cb.checked }); g.hideCredit = cb.checked;
+      if (g.status === "active") { const a = await fs.getDoc(fs.doc(db, "galleries", g.id, "private", "access")); if (a.exists()) await fs.updateDoc(fs.doc(db, "vaults", a.data().key), { hideCredit: cb.checked }); await fs.updateDoc(fs.doc(db, "teasers", g.id), { hideCredit: cb.checked }); }
+      toast(t("savedOk")); } catch (e) { toast(t("err"), "bad"); cb.checked = !cb.checked; } };
+    c.append(el("label", { style: "display:flex;gap:8px;align-items:center" }, cb, t("hideCredit")));
+  }
   if (g.status === "pending") {
     acts.append(el("button", { class: "btn sm gold", text: t("activate"), onclick: async e => { e.target.disabled = true; e.target.textContent = t("activating");
       try { await activate(g); toast(t("activated")); orders(p); } catch (x) { console.error(x); toast(t("err") + " " + (x.code || x.message || ""), "bad"); e.target.disabled = false; e.target.textContent = t("activate"); } } }),
       el("button", { class: "btn sm danger", text: t("reject"), onclick: async () => { const r = prompt(t("rejectQ")); if (r == null) return;
-        try { await fs.updateDoc(fs.doc(db, "galleries", g.id), { status: "rejected", rejectReason: r.slice(0, 200), reviewedAt: fs.serverTimestamp() }); orders(p); } catch (x) { toast(t("err"), "bad"); } } }));
+        try { await fs.updateDoc(fs.doc(db, "galleries", g.id), { status: "rejected", rejectReason: r.slice(0, 200), reviewedAt: fs.serverTimestamp(), reviewedBy: user.uid }); audit("reject", g.id, { reason: r.slice(0, 200) }); orders(p); } catch (x) { toast(t("err"), "bad"); } } }));
   }
   if (g.status === "active") {
     try { const a = await fs.getDoc(fs.doc(db, "galleries", g.id, "private", "access")); if (a.exists()) { const { pin } = a.data(); const url = museumUrl(g.id);
@@ -217,17 +243,20 @@ async function activate(g) {
   const pin = randomPin(), key = await vaultKey(g.id, pin);
   const openAt = g.openAt || fs.Timestamp.now();
   const ph = await fs.getDocs(fs.collection(db, "galleries", g.id, "photos"));
+  const expiresAt = fs.Timestamp.fromMillis(openAt.toMillis() + (g.months || 12) * 30 * 864e5);
   await fs.setDoc(fs.doc(db, "vaults", key), { owner: g.owner, gid: g.id, status: "active", demo: false, title: g.title, recipient: g.recipient, sender: g.sender, dedication: g.dedication || "",
     company: g.company || { name: "", logo: "" }, template: g.template || "classic", music: g.music || "", visitors: g.visitors || 4, sideRoom: !!g.sideRoom, openAt, photoCount: ph.size,
-    expiresAt: fs.Timestamp.fromMillis(openAt.toMillis() + (g.months || 12) * 30 * 864e5), createdAt: fs.serverTimestamp() });
+    hideCredit: !!g.hideCredit, expiresAt, createdAt: fs.serverTimestamp() });
   for (const d of ph.docs) await fs.setDoc(fs.doc(db, "vaults", key, "photos", d.id), d.data());
   const b = fs.writeBatch(db);
-  b.set(fs.doc(db, "teasers", g.id), { status: "active", title: g.title, recipient: g.recipient, sender: g.sender, openAt, logo: g.company?.logo || "", owner: g.owner });
+  b.set(fs.doc(db, "teasers", g.id), { status: "active", title: g.title, recipient: g.recipient, sender: g.sender, openAt, expiresAt, logo: g.company?.logo || "", owner: g.owner,
+    template: g.template || "classic", sideRoom: !!g.sideRoom, hideCredit: !!g.hideCredit });
   b.set(fs.doc(db, "galleries", g.id, "private", "access"), { pin, key, at: fs.serverTimestamp() });
   b.update(fs.doc(db, "galleries", g.id), { status: "active", activatedAt: fs.serverTimestamp(), activatedBy: user.uid, photosMoved: true });
   if (g.discountCode) b.update(fs.doc(db, "discounts", g.discountCode), { used: fs.increment(1) });
   await b.commit();
   for (const d of ph.docs) await fs.deleteDoc(d.ref);
+  audit("activate", g.id, { price: g.price || 0, currency: g.currency || "" });
 }
 
 /* ---------- trials ---------- */
@@ -256,7 +285,8 @@ async function createTrial(name, phone) {
   await fs.setDoc(fs.doc(db, "trials", phone), { name, by: user.uid, byName: user.displayName || user.email || "", gid, at: fs.serverTimestamp(), expiresAt: exp });
   await fs.setDoc(fs.doc(db, "vaults", key), { owner: user.uid, gid, status: "trial", demo: true, title: lang === "ar" ? "معرض ذكرياتنا" : "Our Memories Museum", recipient: name, sender: "هدايا أمير",
     dedication: "", company: { name: "", logo: "" }, template: "classic", music: "", visitors: 4, sideRoom: false, openAt: now, expiresAt: exp, photoCount: 0, createdAt: fs.serverTimestamp() });
-  await fs.setDoc(fs.doc(db, "teasers", gid), { status: "trial", title: lang === "ar" ? "معرض ذكرياتنا" : "Our Memories Museum", recipient: name, sender: "هدايا أمير", openAt: now, expiresAt: exp, logo: "", owner: user.uid });
+  await fs.setDoc(fs.doc(db, "teasers", gid), { status: "trial", title: lang === "ar" ? "معرض ذكرياتنا" : "Our Memories Museum", recipient: name, sender: "هدايا أمير", openAt: now, expiresAt: exp, logo: "", owner: user.uid, template: "classic", sideRoom: false });
+  audit("trial", gid, { phone });
   return { gid, pin };
 }
 
@@ -271,11 +301,13 @@ async function pricingTab(p) {
     return el("div", { class: "pkg" }, el("div", { class: "row2" }, txt(pk, "nameAr", t("nameAr")), txt(pk, "nameEn", t("nameEn"), "ltr")), el("div", { class: "row2" }, num(pk, "visitors", t("visitors")), num(pk, "months", t("months"))),
       el("div", { class: "grid3" }, ...curs.map(c => num(pk.prices, c, CURRENCIES[c][lang]))),
       el("div", { class: "line" }, el("label", { style: "display:flex;gap:8px;align-items:center" }, biz, t("biz")), el("button", { class: "btn sm danger", type: "button", text: t("removePkg"), onclick: () => { pr.packages.splice(i, 1); drawPk(); } }))); })); }
-  drawPk(); pr.sideRoom = pr.sideRoom || {}; pr.bank = pr.bank || {};
+  drawPk(); pr.sideRoom = pr.sideRoom || {}; pr.bank = pr.bank || {}; pr.contact = pr.contact || {}; pr.hideCredit = pr.hideCredit || {};
   p.replaceChildren(sec(t("pkgs"), pkBox, el("button", { class: "btn ghost", text: t("addPkg"), onclick: () => { pr.packages.push({ id: "p" + randomId(5), nameAr: "", nameEn: "", visitors: 4, months: 12, business: false, prices: { USD: 0, SAR: 0, SDG: 0 } }); drawPk(); } })),
     sec(t("side"), el("div", { class: "grid3" }, ...curs.map(c => num(pr.sideRoom, c, CURRENCIES[c][lang])))),
+    sec(t("hidePrice"), el("div", { class: "grid3" }, ...curs.map(c => num(pr.hideCredit, c, CURRENCIES[c][lang])))),
     sec(t("bank"), txt(pr.bank, "name", t("bankName")), txt(pr.bank, "holder", t("holder")), txt(pr.bank, "account", t("account"), "ltr"), txt(pr.bank, "note", t("note"))),
-    el("button", { class: "btn gold block", text: t("save"), onclick: async () => { try { await fs.setDoc(fs.doc(db, "settings", "pricing"), { packages: pr.packages, sideRoom: pr.sideRoom, bank: pr.bank, updatedAt: fs.serverTimestamp() }); toast(t("savedOk")); } catch (e) { toast(t("noPerm"), "bad"); } } }));
+    sec(t("contact"), txt(pr.contact, "whatsapp", t("phone"), "ltr")),
+    el("button", { class: "btn gold block", text: t("save"), onclick: async () => { try { await fs.setDoc(fs.doc(db, "settings", "pricing"), { packages: pr.packages, sideRoom: pr.sideRoom, hideCredit: pr.hideCredit, bank: pr.bank, contact: { whatsapp: normalizePhone(pr.contact.whatsapp || "") }, updatedAt: fs.serverTimestamp() }); audit("pricing", "settings/pricing"); toast(t("savedOk")); } catch (e) { toast(t("noPerm"), "bad"); } } }));
 }
 
 /* ---------- discount codes ---------- */
@@ -289,7 +321,7 @@ async function codes(p) {
     if (!/^[A-Z0-9]{3,20}$/.test(code)) return toast(t("badCodeName"), "bad"); const v = Number(f.value.value); if (!(v > 0)) return toast(t("value"), "bad");
     try { if ((await fs.getDoc(fs.doc(db, "discounts", code))).exists()) return toast(t("exists"), "bad");
       await fs.setDoc(fs.doc(db, "discounts", code), { type: f.type.value, value: v, currency: f.type.value === "amount" ? f.currency.value : "", maxUses: Number(f.max.value) || 0, used: 0, active: true,
-        expiresAt: f.exp.value ? fs.Timestamp.fromDate(new Date(f.exp.value + "T23:59:59")) : null, createdAt: fs.serverTimestamp() }); toast(t("savedOk")); codes(p); } catch (e) { toast(t("noPerm"), "bad"); } } },
+        expiresAt: f.exp.value ? fs.Timestamp.fromDate(new Date(f.exp.value + "T23:59:59")) : null, createdAt: fs.serverTimestamp() }); audit("code", code); toast(t("savedOk")); codes(p); } catch (e) { toast(t("noPerm"), "bad"); } } },
     el("div", { class: "row2" }, el("label", { class: "f" }, el("span", { text: t("codeL") }), f.code), el("label", { class: "f" }, el("span", { text: t("type") }), f.type)),
     el("div", { class: "row2" }, el("label", { class: "f" }, el("span", { text: t("value") }), f.value), curWrap), el("div", { class: "row2" }, el("label", { class: "f" }, el("span", { text: t("maxUses") }), f.max), el("label", { class: "f" }, el("span", { text: t("expires") }), f.exp)),
     el("button", { class: "btn gold", text: t("create") }));
@@ -314,12 +346,41 @@ async function feedback(p) {
     : [el("p", { class: "muted", text: t("none") })])));
 }
 
+/* ---------- comment moderation across museums ---------- */
+async function comments(p) {
+  const gs = (await getAll("galleries")).filter(g => g.status === "active").sort((a, b) => ms(b.activatedAt) - ms(a.activatedAt));
+  const box = el("div", { class: "lst" });
+  p.replaceChildren(sec(t("modH"), el("p", { class: "muted small", style: "margin:0", text: t("modP") })), box);
+  for (const g of gs.slice(0, 30)) {
+    let key = ""; try { const a = await fs.getDoc(fs.doc(db, "galleries", g.id, "private", "access")); key = a.exists() ? a.data().key : ""; } catch (e) {}
+    if (!key) continue;
+    let soc = []; try { soc = await getAll(`vaults/${key}/social`); } catch (e) { continue; }
+    const items = soc.flatMap(v => (v.comments || []).map(c => ({ uid: v.id, name: v.name || "—", ...c }))).sort((a, b) => b.at - a.at);
+    if (!items.length) continue;
+    box.append(el("div", { class: "card stack", style: "gap:8px" }, el("b", { text: g.title }), ...items.slice(0, 20).map(c => el("div", { class: "line" },
+      el("div", {}, el("b", { class: "small", text: c.name }), el("p", { style: "margin:0;white-space:pre-wrap", text: c.t })),
+      el("button", { class: "btn sm danger", text: t("del"), onclick: async ev => { if (!confirm(t("delQ"))) return; ev.target.disabled = true;
+        try { const r = fs.doc(db, "vaults", key, "social", c.uid); const s = await fs.getDoc(r); await fs.updateDoc(r, { comments: (s.data().comments || []).filter(x => x.at !== c.at) }); audit("deleteComment", g.id, { text: String(c.t).slice(0, 80) }); ev.target.closest(".line").remove(); }
+        catch (e) { toast(t("noPerm"), "bad"); ev.target.disabled = false; } } })))));
+  }
+  if (!box.childNodes.length) box.append(el("p", { class: "muted", text: t("none") }));
+}
+
+/* ---------- activity log ---------- */
+async function logTab(p) {
+  const s = await fs.getDocs(fs.query(fs.collection(db, "audit"), fs.orderBy("at", "desc"), fs.limit(100)));
+  const rows = s.docs.map(d => d.data());
+  p.replaceChildren(sec(t("logH"), ...(rows.length ? rows.map(r => el("div", { class: "line", style: "border-bottom:1px solid var(--line);padding:6px 0" },
+    el("div", {}, el("b", { text: (t("act")[r.action] || r.action) + (r.ref ? " · " + r.ref : "") }), el("div", { class: "small muted", text: (r.byName || r.by) + (r.reason ? " · " + r.reason : "") + (r.price ? " · " + money(r.price, r.currency, lang) : "") })),
+    el("span", { class: "small muted", text: fmtDate(r.at) }))) : [el("p", { class: "muted", text: t("none") })])));
+}
+
 /* ---------- team ---------- */
 async function team(p) {
   const [members, reqs] = await Promise.all([getAll("roles"), getAll("staffRequests")]);
   const roles = ["admin", "staff", "marketer"];
   const mRows = members.map(m => { const sel = el("select", { class: "in", style: "width:auto;min-height:38px", disabled: m.id === user.uid }, ...roles.map(r => el("option", { value: r, text: t("role")[r], selected: m.role === r })));
-    sel.onchange = async () => { await fs.updateDoc(fs.doc(db, "roles", m.id), { role: sel.value }); toast(t("savedOk")); };
+    sel.onchange = async () => { await fs.updateDoc(fs.doc(db, "roles", m.id), { role: sel.value }); audit("role", m.email || m.id, { role: sel.value }); toast(t("savedOk")); };
     return el("div", { class: "card line", style: "padding:12px" }, el("div", {}, el("b", { text: (m.name || m.email || m.id) + (m.id === user.uid ? " " + t("you") : "") }), el("div", { class: "small muted", text: m.email || "" })),
       el("div", { class: "acts" }, sel, m.id !== user.uid ? el("button", { class: "btn sm danger", text: t("remove"), onclick: async () => { if (!confirm(t("delQ"))) return; await fs.deleteDoc(fs.doc(db, "roles", m.id)); team(p); } }) : null)); });
   const rRows = reqs.map(r => el("div", { class: "card stack", style: "padding:12px;gap:8px" }, el("div", {}, el("b", { text: r.name || r.email }), el("div", { class: "small muted", text: r.email || "" })),

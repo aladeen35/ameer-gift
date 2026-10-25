@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>هدايا أمير — المتحف</title>
+<meta name="description" content="متحف ذكريات ثلاثي الأبعاد من هدايا أمير">
+<meta name="theme-color" content="#13294B">
+<meta name="robots" content="noindex">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Reem+Kufi:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/src/museum/museum.css">
+</head>
+<body class="blurred">
+<canvas id="gl" tabindex="0" aria-label="المتحف ثلاثي الأبعاد"></canvas>
+
+<!-- loader -->
+<div id="loader" role="status"><div class="inner">
+  <img class="brandlogo" id="loaderLogo" src="logo-full.png" alt="هدايا أمير — Ameer Gift">
+  <div class="bar"><i id="lbar"></i></div><p id="lmsg">…</p>
+</div></div>
+
+<!-- full-screen messages: wrong link, expired, museum full, trial ended -->
+<section id="msg" class="screen hidden" role="alertdialog" aria-labelledby="msgT">
+  <div class="panel">
+    <img class="brandlogo small" data-logo alt="">
+    <h1 id="msgT"></h1><p id="msgP"></p>
+    <div class="acts" id="msgActs"></div>
+  </div>
+</section>
+
+<!-- waiting page -->
+<section id="soon" class="hidden">
+  <div class="soon-top"><button class="round lang" data-lang>EN</button></div>
+  <div class="soon-c">
+    <p class="soon-k" aria-hidden="true">Soon</p><p class="soon-ar" aria-hidden="true">قريبًا</p>
+    <h1 id="sTitle"></h1><p class="soon-sub" id="sLine"></p>
+    <div class="cd" id="cd" role="timer" aria-live="off">
+      <div><b id="cd0">00</b><span id="cl0"></span></div><div><b id="cd1">00</b><span id="cl1"></span></div>
+      <div><b id="cd2">00</b><span id="cl2"></span></div><div><b id="cd3">00</b><span id="cl3"></span></div>
+    </div>
+    <p class="soon-date" id="sDate"></p>
+    <div class="soon-act">
+      <button class="primary gold" id="remind" aria-expanded="false"></button>
+      <div class="remopts hidden" id="remopts"><a id="gcal" target="_blank" rel="noopener"></a><a id="ics" download="ameer-gift-opening.ics"></a></div>
+    </div>
+  </div>
+  <img class="soon-logo" data-logo alt="">
+</section>
+
+<!-- access code -->
+<section id="pin" class="screen hidden" aria-labelledby="pinT">
+  <div class="panel">
+    <img class="brandlogo small" data-logo alt="">
+    <h1 id="pinT"></h1><p id="pinP"></p>
+    <form id="pinForm" novalidate>
+      <div class="pins" dir="ltr">
+        <input inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="1"><input inputmode="numeric" maxlength="1" aria-label="2"><input inputmode="numeric" maxlength="1" aria-label="3"><input inputmode="numeric" maxlength="1" aria-label="4">
+      </div>
+      <p class="err" id="pinErr" role="alert"></p>
+      <button class="primary block" id="pinGo"></button>
+    </form>
+    <button class="round lang" data-lang>EN</button>
+  </div>
+</section>
+
+<!-- entrance: character picker -->
+<section id="intro" class="hidden">
+  <header class="itop">
+    <img class="logo-top" data-logo alt="">
+    <div class="hbtns"><button class="round lang" data-lang>EN</button><button class="round" id="credBtn" aria-label="Credits">ⓘ</button></div>
+  </header>
+  <div class="invite"><h1 id="iTitle"></h1><p id="iLine"></p></div>
+  <div class="carousel" id="carousel">
+    <button class="round nav" id="prevAv" aria-label="previous">‹</button>
+    <button class="round nav" id="nextAv" aria-label="next">›</button>
+  </div>
+  <div class="sheet" id="sheet">
+    <div class="grab"></div>
+    <h2 id="sheetH"></h2>
+    <div class="who" role="group" id="who">
+      <button data-who="man" aria-pressed="true"><svg viewBox="0 0 20 40" fill="currentColor"><circle cx="10" cy="5" r="4.2"/><path d="M4 12h12l1.5 13h-3l-1 15h-3l-.5-11-.5 11h-3l-1-15h-3z"/></svg><span></span></button>
+      <button data-who="woman" aria-pressed="false"><svg viewBox="0 0 20 40" fill="currentColor"><circle cx="10" cy="5" r="4.2"/><path d="M5 12h10l2 14h-2.5l-.8 14h-3l-.7-12-.7 12h-3l-.8-14H3z"/></svg><span></span></button>
+      <button data-who="boy" aria-pressed="false"><svg viewBox="0 0 20 40" fill="currentColor"><circle cx="10" cy="15" r="4.4"/><path d="M5 21h10l1.2 9h-2.6l-.8 10h-2.5l-.3-7-.3 7H7.2l-.8-10H3.8z"/></svg><span></span></button>
+      <button data-who="girl" aria-pressed="false"><svg viewBox="0 0 20 40" fill="currentColor"><circle cx="10" cy="15" r="4.4"/><path d="M5.5 21h9l1.8 10h-2.2l-.7 9h-2.6l-.3-7-.3 7H7.6l-.7-9H3.7z"/></svg><span></span></button>
+    </div>
+    <div class="seg3" id="height" role="group"><button data-h="0.95"></button><button data-h="1" aria-pressed="true"></button><button data-h="1.05"></button></div>
+    <div id="liteLook">
+      <div class="row"><span id="rSkin"></span><div class="sw" id="sw-skin"></div></div>
+      <div class="row"><span id="rHair"></span><div class="sw" id="sw-hair"></div></div>
+      <div class="row"><span id="rOutfit"></span><div class="sw" id="sw-outfit"></div></div>
+    </div>
+    <p class="variant" id="variant"></p>
+    <div class="go">
+      <label class="avatar" id="avbtn"><input type="file" id="avfile" accept="image/*"><span id="avtxt"></span></label>
+      <input id="name" maxlength="18" autocomplete="off" enterkeyhint="go">
+      <button class="primary" id="enter"></button>
+    </div>
+  </div>
+</section>
+
+<!-- in-museum HUD -->
+<section id="hud" class="hidden">
+  <div class="top">
+    <div class="chip titlechip"><img class="logo-icon" data-logo-icon alt=""><b id="hTitle"></b></div>
+    <div class="chip tools" role="toolbar">
+      <button id="tEmote" aria-haspopup="true">🙂</button>
+      <button id="tSound" aria-pressed="false"></button>
+      <button id="tFull"></button>
+      <button id="tSet" aria-haspopup="dialog"></button>
+    </div>
+  </div>
+  <div class="chip countchip" id="count"></div>
+  <div class="chip people hidden" id="people"><div class="dots" id="pdots"></div><span id="pcount"></span></div>
+  <div class="emotes hidden" id="emotes" role="menu">
+    <button data-emote="wave" role="menuitem">👋</button><button data-emote="clap" role="menuitem">👏</button><button data-emote="look" role="menuitem">👀</button><button data-emote="sit" role="menuitem" id="sitBtn">🪑</button>
+  </div>
+  <div id="hint"></div>
+  <div id="joy" aria-label="joystick"><i></i></div>
+  <div class="actions">
+    <button id="sit" class="ghostbtn hidden"></button>
+    <button id="view" class="hidden"></button>
+  </div>
+  <p class="credit hidden" id="credit">by Ameer Gift · هدايا أمير</p>
+</section>
+
+<!-- settings -->
+<dialog id="settings" aria-labelledby="setT">
+  <h2 id="setT"></h2>
+  <div class="setrow"><span id="setQ"></span><div class="seg3" id="qseg"><button data-q="low"></button><button data-q="medium"></button><button data-q="high"></button></div></div>
+  <div class="setrow"><span id="setL"></span><button class="ghostbtn" data-lang>EN</button></div>
+  <div class="setrow"><span id="setM"></span><button class="ghostbtn" id="setMotion" aria-pressed="false"></button></div>
+  <p class="small" id="setInfo"></p>
+  <div class="acts"><a class="ghostbtn" id="setCred" href="credits.html" target="_blank" rel="noopener"></a><button class="ghostbtn" id="exit"></button><button class="primary" id="setClose"></button></div>
+</dialog>
+
+<!-- painting viewer -->
+<div id="viewer" class="hidden" role="dialog" aria-modal="true" aria-labelledby="vtitle">
+  <div class="vwrap">
+    <div class="frame"><div><img id="vimg" alt=""></div></div>
+    <div class="card">
+      <h3 id="vtitle"></h3><p class="year" id="vyear"></p><p class="cap" id="vcap"></p>
+      <div class="social"><button class="like" id="like" aria-pressed="false"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.6 4.5c2.1 0 3.6 1.2 4.4 2.5.8-1.3 2.3-2.5 4.4-2.5 3.6 0 5.7 3.9 4.2 7.3C19.5 16.4 12 21 12 21z"/></svg><span id="likeN">0</span></button><span class="snote" id="snote"></span></div>
+      <div class="clist" id="clist"></div>
+      <form class="cadd" id="cform"><input id="ctext" maxlength="200" enterkeyhint="send"><button id="csend"></button></form>
+      <div class="vnav"><button class="ghostbtn" id="vprev" aria-label="previous">‹</button><button class="primary" id="vclose"></button><button class="ghostbtn" id="vnext" aria-label="next">›</button></div>
+    </div>
+  </div>
+</div>
+<div id="fade"></div>
+<div id="yt" aria-hidden="true"></div>
+<script type="module" src="/src/museum/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "presence": {
+      "$key": {
+        ".read": "auth != null",
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "!newData.exists() || newData.hasChildren(['x', 'z'])",
+          "x": { ".validate": "newData.isNumber() && newData.val() > -40 && newData.val() < 40" },
+          "z": { ".validate": "newData.isNumber() && newData.val() > -40 && newData.val() < 40" },
+          "y": { ".validate": "newData.isNumber()" },
+          "s": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() < 10" },
+          "st": { ".validate": "newData.isNumber()" },
+          "h": { ".validate": "newData.isNumber() && newData.val() > 0.8 && newData.val() < 1.2" },
+          "n": { ".validate": "newData.isString() && newData.val().length <= 18" },
+          "p": { ".validate": "newData.isString() && newData.val().length <= 60000" },
+          "k": { ".validate": "newData.isString() && newData.val().matches(/^(man|woman|boy|girl)$/)" },
+          "v": { ".validate": "newData.isString() && newData.val().length <= 40" },
+          "lk": { "$i": { ".validate": "newData.isNumber()" } },
+          "e": { ".validate": "newData.isString() && newData.val().matches(/^(wave|clap|look)$/)" },
+          "et": { ".validate": "newData.isNumber()" },
+          "t": { ".validate": "newData.isNumber() && newData.val() <= now + 60000" },
+          "$other": { ".validate": false }
+        }
+      }
+    }
+  }
+}

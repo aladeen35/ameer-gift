@@ -11,7 +11,7 @@
 <meta name="theme-color" content="#13294B">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Reem+Kufi:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/src/style.css">
 <style>
 .hero{padding:34px 0 10px;text-align:center}
 .hero img{width:min(230px,60vw);height:auto;background:#fff;border-radius:24px;padding:10px 14px}
@@ -40,6 +40,11 @@
 .total span:last-child{font-family:var(--font-display);font-size:26px;color:var(--gold)}
 .logoprev{max-height:90px;max-width:100%;background:repeating-conic-gradient(#eee 0 25%,#fff 0 50%) 0/16px 16px;border-radius:10px;padding:6px}
 .count{font-size:14px;color:var(--muted)}
+.tile img.thumb{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:10px;margin-bottom:6px;background:var(--surface-2)}
+.demo-cta{display:flex;justify-content:center;margin:-6px 0 18px}
+.editph{display:grid;grid-template-columns:64px 1fr;gap:8px;align-items:start;border-top:1px solid var(--line);padding-top:10px}
+.editph img{width:64px;height:64px;object-fit:cover;border-radius:10px}
+.visits{font-size:13px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -60,6 +65,7 @@
       <img src="logo-full.png" alt="">
       <h1 data-t="heroT"></h1><p data-t="heroP"></p>
     </div>
+    <div class="demo-cta"><a class="btn gold" href="museum.html?demo=1" data-t="tryDemo"></a></div>
     <div class="feats"><div><b data-t="f1n"></b><span data-t="f1"></span></div><div><b data-t="f2n"></b><span data-t="f2"></span></div><div><b>⏳</b><span data-t="f3"></span></div></div>
     <div class="card">
       <h2 style="font-size:21px;margin-bottom:14px" id="authTitle"></h2>
@@ -111,6 +117,7 @@
         <label class="btn ghost sm" style="position:relative"><span data-t="coLogo"></span><input type="file" id="wLogo" accept="image/*" style="position:absolute;opacity:0;width:1px;height:1px"></label>
         <p class="hint" style="margin-top:8px" data-t="coLogoHint"></p>
         <img id="logoPrev" class="logoprev hidden" alt="">
+        <label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="wHide"><span><span data-t="hideCredit"></span> <span class="muted small" id="hidePrice"></span></span></label>
       </div>
     </div>
 
@@ -173,7 +180,7 @@
 
 <script type="module">
 import { auth, db, fs, au, googleSignIn, $, $$, el, toast, normalizePhone, phoneOk, latinDigits, fmtNum, CURRENCIES, money, randomId,
-  compressImage, compressLogo, promptInstall, loadPricing, priceOf, applyDiscount, discountValid, museumUrl, waShare, authError } from "./shared.js";
+  compressImage, compressLogo, promptInstall, loadPricing, priceOf, applyDiscount, discountValid, museumUrl, waShare, authError } from "/src/shared.js";
 
 /* ---------- language ---------- */
 let lang = localStorage.getItem("ag-lang") || (/^ar/i.test(navigator.language) ? "ar" : "en");
@@ -186,14 +193,15 @@ const T = {
   s0h:"اختر الباقة",individual:"أفراد",company:"شركات",visitors:n=>`حتى ${n} زوار معًا`,months:n=>`يبقى المعرض ${n} شهرًا`,sideRoom:"غرفة جانبية",sideRoomD:"تضاعف عدد الصور من ١٤ إلى ٢٨",
   s1h:"بطاقة الإهداء",mTitle:"عنوان المعرض",recipient:"إلى",sender:"من",dedText:"نص الإهداء",dedHint:"هذا النص يظهر على بطاقة المدخل، وتستطيع تعديله لاحقًا.",coName:"اسم الشركة",coLogo:"رفع شعار الشركة",coLogoHint:"PNG بخلفية شفافة أفضل. يظهر الشعار مكان شعار هدايا أمير.",
   s2h:"صور الذكريات",s2p:"ارفع كل الصور مرة واحدة، واكتب تاريخ كل صورة. ستترتب في المعرض من الأقدم إلى الأحدث.",addPhotos:"اختر الصور",of:(a,b)=>`${a} من ${b}`,date:"التاريخ",title:"العنوان",caption:"التعليق",ai:"اقتراح تعليق بالذكاء الاصطناعي (قريبًا)",remove:"إزالة",tooMany:n=>`الحد الأقصى ${n} صورة في هذه الباقة`,
-  s3h:"شكل المعرض",tpl:{classic:["الكلاسيكي الذهبي","جدران كحلية، نجف ذهبي، وإضاءة دافئة"],garden:["الحديقة","قريبًا"],wedding:["الزفاف","قريبًا"],grad:["التخرج","قريبًا"]},music:"رابط الموسيقى من يوتيوب (اختياري)",musicHint:"رفع ملف أغنية من جوالك سيتوفر قريبًا. تأكد أن لك حق استخدام الموسيقى.",badYt:"الرابط ليس من يوتيوب",
+  s3h:"شكل المعرض",tpl:{classic:["الكلاسيكي الذهبي","جدران كحلية، نجف ذهبي، وإضاءة دافئة"],garden:["الحديقة","خضرة ونخيل وفوانيس وأرضية حجرية"],wedding:["الزفاف","أبيض ووردي، قوس زهور ونجف كريستال"],grad:["التخرج","كحلي وسماوي، أعلام ملوّنة وأرضية خشب"]},music:"رابط الموسيقى من يوتيوب (اختياري)",musicHint:"رفع ملف أغنية من جوالك سيتوفر قريبًا. تأكد أن لك حق استخدام الموسيقى.",badYt:"الرابط ليس من يوتيوب",
   s4h:"متى يُفتح المعرض؟",openAt:"تاريخ ووقت الفتح",openHint:"قبل هذا الموعد يرى الزوار صفحة انتظار بعدّ تنازلي، ثم يُفتح المعرض تلقائيًا.",openNow:"افتحه فور التفعيل",
   s5h:"المراجعة والدفع",pkg:"الباقة",photos:"الصور",rooms:"القاعات",opens:"الفتح",immediately:"فور التفعيل",price:"السعر",discount:"الخصم",apply:"تطبيق",codePh:"كود الخصم",badCode:"الكود غير صالح أو منتهي",codeOk:v=>`تم تطبيق خصم ${v}`,total:"الإجمالي",
   phone:"رقم جوالك (واتساب)",bankH:"حوّل المبلغ إلى الحساب التالي، ثم ارفع صورة الإشعار",bankName:"البنك",accName:"اسم صاحب الحساب",accNo:"رقم الحساب",receipt:"رفع صورة إشعار التحويل",receiptOk:"تم إرفاق الإشعار ✓",
   back:"رجوع",next:"التالي",submit:"إرسال الطلب",saving:"جارٍ الحفظ…",saved:"تم الحفظ",submitted:"تم إرسال طلبك. سنراجع التحويل قريبًا.",
   req:{to:"اكتب اسم المُهدى إليه",from:"اكتب اسمك",photos:"أضف صورة واحدة على الأقل",dates:"اكتب تاريخ كل صورة",open:"اختر موعد الفتح",phone:"اكتب رقم جوالك مع رمز الدولة، مثل 966 أو 249",receipt:"ارفع صورة إشعار التحويل",pkg:"اختر باقة"},
   fbH:"رأيك يهمنا",fbP:"اكتب رأيك أو اقتراحك أو شكواك، وتصل مباشرة لفريق هدايا أمير.",fbOpinion:"رأي",fbSuggest:"اقتراح",fbComplaint:"شكوى",fbName:"اسمك (اختياري)",fbText:"اكتب هنا",send:"إرسال",fbThanks:"شكرًا، وصلتنا رسالتك",fbEmpty:"اكتب رسالتك أولًا",
-  defTitle:"معرض ذكرياتنا",permission:"لا تملك صلاحية لهذه العملية",loadErr:"تعذّر تحميل البيانات"},
+  defTitle:"معرض ذكرياتنا",permission:"لا تملك صلاحية لهذه العملية",loadErr:"تعذّر تحميل البيانات",
+  tryDemo:"جرّب متحفًا تجريبيًا الآن",hideCredit:"إخفاء عبارة «من هدايا أمير» داخل المعرض",editM:"تعديل المعرض",editH:"تعديل المعرض بعد التفعيل",editP:"التعديلات تظهر للزوار مباشرة. الصور نفسها لا تتغير بعد التفعيل.",save:"حفظ التعديلات",visitsN:n=>`${n} زيارة`,editPhotos:"عناوين الصور وتعليقاتها",close:"إغلاق",modNote:"لحذف تعليق، افتح المعرض وأنت مسجّل الدخول، وستظهر لك أزرار الحذف."},
  en:{install:"Install app",heroT:"A 3D memories museum, gifted to someone you love",f1n:"3D",f2n:"28",heroP:"Upload your photos, pick the decor, music and opening time, and we prepare a museum your loved ones walk through together.",f1:"A museum to walk",f2:"photos at most",f3:"A countdown surprise",
   signin:"Sign in",signup:"Create account",google:"Continue with Google",or:"or with email",fullName:"Name",email:"Email",password:"Password",forgot:"Forgot password?",toSignup:"No account? Create one",toSignin:"Have an account? Sign in",
   resetSent:"We sent a reset link to your email",needEmail:"Enter your email first",out:"Sign out",hello:n=>`Hello ${n}`,myMuseums:"My museums",newMuseum:"New museum",empty:"No museums yet. Create your first one.",
@@ -202,14 +210,15 @@ const T = {
   s0h:"Choose a package",individual:"Individuals",company:"Companies",visitors:n=>`Up to ${n} visitors together`,months:n=>`Stays open ${n} months`,sideRoom:"Side room",sideRoomD:"Doubles photos from 14 to 28",
   s1h:"Dedication card",mTitle:"Museum title",recipient:"To",sender:"From",dedText:"Dedication text",dedHint:"This text appears on the entrance card, and you can edit it later.",coName:"Company name",coLogo:"Upload company logo",coLogoHint:"A transparent PNG works best. It replaces the Ameer Gift logo.",
   s2h:"Memory photos",s2p:"Upload all photos at once and set each photo's date. They are arranged from oldest to newest.",addPhotos:"Choose photos",of:(a,b)=>`${a} of ${b}`,date:"Date",title:"Title",caption:"Caption",ai:"Suggest a caption with AI (soon)",remove:"Remove",tooMany:n=>`This package allows ${n} photos`,
-  s3h:"Museum style",tpl:{classic:["Classic Gold","Navy walls, gold chandeliers, warm light"],garden:["Garden","Soon"],wedding:["Wedding","Soon"],grad:["Graduation","Soon"]},music:"Music link from YouTube (optional)",musicHint:"Uploading a song file from your phone is coming soon. Make sure you have the right to use the music.",badYt:"This is not a YouTube link",
+  s3h:"Museum style",tpl:{classic:["Classic Gold","Navy walls, gold chandeliers, warm light"],garden:["Garden","Greenery, palms, lanterns and stone floor"],wedding:["Wedding","White and blush, a flower arch and crystal chandeliers"],grad:["Graduation","Navy and sky, bunting and a wooden floor"]},music:"Music link from YouTube (optional)",musicHint:"Uploading a song file from your phone is coming soon. Make sure you have the right to use the music.",badYt:"This is not a YouTube link",
   s4h:"When does the museum open?",openAt:"Opening date and time",openHint:"Before this time visitors see a waiting page with a countdown, then the museum opens by itself.",openNow:"Open as soon as it is activated",
   s5h:"Review and pay",pkg:"Package",photos:"Photos",rooms:"Halls",opens:"Opens",immediately:"On activation",price:"Price",discount:"Discount",apply:"Apply",codePh:"Discount code",badCode:"Invalid or expired code",codeOk:v=>`Discount applied: ${v}`,total:"Total",
   phone:"Your mobile (WhatsApp)",bankH:"Transfer the amount to this account, then upload the receipt",bankName:"Bank",accName:"Account holder",accNo:"Account number",receipt:"Upload transfer receipt",receiptOk:"Receipt attached ✓",
   back:"Back",next:"Next",submit:"Send order",saving:"Saving…",saved:"Saved",submitted:"Your order was sent. We will check the transfer soon.",
   req:{to:"Enter the recipient's name",from:"Enter your name",photos:"Add at least one photo",dates:"Set a date for every photo",open:"Choose the opening time",phone:"Enter your mobile with the country code, like 966 or 249",receipt:"Upload the transfer receipt",pkg:"Choose a package"},
   fbH:"We value your opinion",fbP:"Share an opinion, suggestion or complaint. It goes straight to the Ameer Gift team.",fbOpinion:"Opinion",fbSuggest:"Suggestion",fbComplaint:"Complaint",fbName:"Your name (optional)",fbText:"Write here",send:"Send",fbThanks:"Thank you, we received your message",fbEmpty:"Write your message first",
-  defTitle:"Our Memories Museum",permission:"You don't have permission for this",loadErr:"Could not load data"}};
+  defTitle:"Our Memories Museum",permission:"You don't have permission for this",loadErr:"Could not load data",
+  tryDemo:"Try a demo museum now",hideCredit:"Hide the \"by Ameer Gift\" line inside the museum",editM:"Edit museum",editH:"Edit the museum after activation",editP:"Changes show to visitors right away. The photos themselves stay as they are after activation.",save:"Save changes",visitsN:n=>`${n} visits`,editPhotos:"Photo titles and captions",close:"Close",modNote:"To delete a comment, open the museum while signed in and the delete buttons appear."}};
 const t = k => T[lang][k];
 function applyLang() {
   document.documentElement.lang = lang; document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
@@ -273,7 +282,9 @@ async function galleryCard(g) {
       const msg = (lang === "ar" ? `🎁 ${g.title || t("defTitle")}\nرابط المعرض: ${url}\nرمز الدخول: ${pin}` : `🎁 ${g.title || t("defTitle")}\nMuseum link: ${url}\nAccess code: ${pin}`);
       c.append(el("div", { class: "access" }, el("div", {}, el("div", { class: "small muted", text: t("linkL") }), el("code", { text: url })), el("button", { class: "btn sm ghost", text: t("copy"), onclick: () => copy(url) })),
         el("div", { class: "access" }, el("div", {}, el("div", { class: "small muted", text: t("pinL") }), el("div", { class: "pin", text: pin })), el("button", { class: "btn sm ghost", text: t("copy"), onclick: () => copy(pin) })));
-      acts.append(el("a", { class: "btn sm gold", href: waShare(msg), target: "_blank", rel: "noopener", text: t("share") }), el("a", { class: "btn sm ghost", href: url, target: "_blank", rel: "noopener", text: t("open") }));
+      acts.append(el("a", { class: "btn sm gold", href: waShare(msg), target: "_blank", rel: "noopener", text: t("share") }), el("a", { class: "btn sm ghost", href: url, target: "_blank", rel: "noopener", text: t("open") }),
+        el("button", { class: "btn sm ghost", text: t("editM"), onclick: () => editMuseum(g, a.data().key) }));
+      fs.getDoc(fs.doc(db, "visits", g.id)).then(v => { if (v.exists()) c.append(el("p", { class: "visits", style: "margin:0", text: "👁 " + T[lang].visitsN(fmtNum(v.data().count || 0, lang)) })); }).catch(() => {});
     } } catch (e) {}
   }
   if (g.openAt?.toDate) c.append(el("p", { class: "small muted", style: "margin:0", text: `${t("opensL")}: ${fmtDate(g.openAt.toDate())}` }));
@@ -286,6 +297,37 @@ async function delDraft(g) { if (!confirm(t("delQ"))) return;
   try { const ps = await fs.getDocs(fs.collection(db, "galleries", g.id, "photos")); for (const p of ps.docs) await fs.deleteDoc(p.ref); await fs.deleteDoc(fs.doc(db, "galleries", g.id)); renderList(); }
   catch (e) { toast(t("permission"), "bad"); } }
 $("#newBtn").onclick = () => openWizard(null);
+
+/* ---------- edit an active museum (words, music, opening time, captions) ---------- */
+async function editMuseum(g, key) {
+  const body = $("#dlgBody"); const v = (await fs.getDoc(fs.doc(db, "vaults", key))).data() || {};
+  const ps = (await fs.getDocs(fs.collection(db, "vaults", key, "photos"))).docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  const inp = (val, max, attrs = {}) => el("input", { class: "in", value: val || "", maxlength: String(max), ...attrs });
+  const f = { title: inp(v.title, 40), to: inp(v.recipient, 30), from: inp(v.sender, 30), ded: el("textarea", { class: "in", maxlength: "300" }), music: inp(v.music, 200, { dir: "ltr" }),
+    open: el("input", { class: "in", type: "datetime-local", value: v.openAt?.toDate ? toLocalInput(v.openAt.toDate()) : "" }) };
+  f.ded.value = v.dedication || "";
+  const rows = ps.map(p => { const ti = inp(p.title, 40, { placeholder: t("title") }), ca = inp(p.caption, 160, { placeholder: t("caption") }), dt = el("input", { class: "in", type: "date", value: p.date || "" }); p._f = { ti, ca, dt };
+    return el("div", { class: "editph" }, el("img", { src: p.img || "", alt: "" }), el("div", { class: "stack", style: "gap:6px" }, dt, ti, ca)); });
+  body.replaceChildren(el("h2", { style: "font-size:20px", text: t("editH") }), el("p", { class: "muted small", text: t("editP") }),
+    el("label", { class: "f" }, el("span", { text: t("mTitle") }), f.title), el("div", { class: "row2" }, el("label", { class: "f" }, el("span", { text: t("recipient") }), f.to), el("label", { class: "f" }, el("span", { text: t("sender") }), f.from)),
+    el("label", { class: "f" }, el("span", { text: t("dedText") }), f.ded), el("label", { class: "f" }, el("span", { text: t("music") }), f.music), el("label", { class: "f" }, el("span", { text: t("openAt") }), f.open),
+    el("b", { text: t("editPhotos") }), ...rows, el("p", { class: "muted small", text: t("modNote") }),
+    el("div", { class: "acts", style: "margin-top:12px" }, el("button", { class: "btn gold", text: t("save"), onclick: async e => {
+      const music = f.music.value.trim(); if (music && !/^https:\/\/(www\.|m\.)?(youtube\.com|youtu\.be)\//i.test(music)) return toast(t("badYt"), "bad");
+      const openMs = f.open.value ? new Date(f.open.value).getTime() : (v.openAt?.toMillis?.() || Date.now());
+      e.target.disabled = true;
+      try {
+        const words = { title: f.title.value.trim() || t("defTitle"), recipient: f.to.value.trim(), sender: f.from.value.trim(), openAt: fs.Timestamp.fromMillis(openMs) };
+        await fs.updateDoc(fs.doc(db, "vaults", key), { ...words, dedication: f.ded.value.trim(), music, updatedAt: fs.serverTimestamp() });
+        await fs.updateDoc(fs.doc(db, "teasers", g.id), words);
+        for (const p of ps) { const n = { title: p._f.ti.value.trim().slice(0, 40), caption: p._f.ca.value.trim().slice(0, 160), date: p._f.dt.value || p.date };
+          if (n.title !== (p.title || "") || n.caption !== (p.caption || "") || n.date !== p.date) await fs.updateDoc(fs.doc(db, "vaults", key, "photos", p.id), n); }
+        await fs.updateDoc(fs.doc(db, "galleries", g.id), { title: words.title, recipient: words.recipient, sender: words.sender, dedication: f.ded.value.trim(), music, openAt: words.openAt, updatedAt: fs.serverTimestamp() }).catch(() => {});
+        toast(t("saved")); $("#dlg").close(); renderList();
+      } catch (x) { console.error(x); toast(t("permission"), "bad"); } finally { e.target.disabled = false; } } }),
+      el("button", { class: "btn ghost", text: t("close"), onclick: () => $("#dlg").close() })));
+  $("#dlg").showModal();
+}
 
 /* ---------- wizard ---------- */
 const N_STEPS = 6; let step = 0, G = null, photos = [], removed = [], discount = null;
@@ -321,7 +363,9 @@ function s1() {
   $("#wTitle").value = G.title || t("defTitle"); $("#wTo").value = G.recipient; $("#wFrom").value = G.sender; $("#wDed").value = G.dedication;
   $("#bizBox").classList.toggle("hidden", G.type !== "company"); $("#wCo").value = G.company?.name || "";
   if (G.company?.logo) { $("#logoPrev").src = G.company.logo; $("#logoPrev").classList.remove("hidden"); }
+  $("#wHide").checked = !!G.hideCredit; $("#hidePrice").textContent = "(+ " + money(pricing.hideCredit?.[G.currency] || 0, G.currency, lang) + ")";
 }
+$("#wHide").onchange = () => { G.hideCredit = $("#wHide").checked; };
 $("#wLogo").onchange = async e => { const f = e.target.files[0]; if (!f) return; try { G.company = G.company || {}; G.company.logo = await compressLogo(f); $("#logoPrev").src = G.company.logo; $("#logoPrev").classList.remove("hidden"); } catch (x) {} };
 function read1() { G.title = $("#wTitle").value.trim() || t("defTitle"); G.recipient = $("#wTo").value.trim(); G.sender = $("#wFrom").value.trim(); G.dedication = $("#wDed").value.trim(); G.company = { ...(G.company || {}), name: $("#wCo").value.trim() }; }
 function s2() { renderPhotos(); }
@@ -347,8 +391,9 @@ $("#wFiles").onchange = async e => {
   }
 };
 function s3() {
-  $("#tplTiles").replaceChildren(...TPL.map(k => { const [n, d] = t("tpl")[k]; const on = k === "classic";
-    return el("button", { class: "tile", "aria-pressed": String(G.template === k), disabled: !on, onclick: () => { G.template = k; s3(); } }, el("b", { text: n }), el("span", { class: "muted small", text: d })); }));
+  $("#tplTiles").replaceChildren(...TPL.map(k => { const [n, d] = t("tpl")[k];
+    return el("button", { class: "tile", "aria-pressed": String(G.template === k), onclick: () => { G.template = k; s3(); } }, el("img", { class: "thumb", src: `templates/${k}.jpg`, alt: "", loading: "lazy" }), el("b", { text: n }), el("span", { class: "muted small", text: d }),
+      el("a", { class: "linkbtn", href: `museum.html?demo=1&tpl=${k}`, target: "_blank", rel: "noopener", text: lang === "ar" ? "معاينة" : "Preview", onclick: e => e.stopPropagation() })); }));
   $("#wMusic").value = G.music || "";
 }
 function s4() { const ms = G.openAtMs; $("#wOpen").value = ms ? toLocalInput(new Date(ms)) : ""; $("#wOpen").min = toLocalInput(new Date()); }
@@ -399,7 +444,7 @@ async function saveDraft(submit) {
     visitors: pk.visitors || 4, months: pk.months || 12, sideRoom: !!G.sideRoom, title: G.title || t("defTitle"), recipient: G.recipient, sender: G.sender, dedication: G.dedication,
     company: G.type === "company" ? { name: G.company?.name || "", logo: G.company?.logo || "" } : { name: "", logo: "" }, template: G.template || "classic", music: G.music || "",
     openAt: G.openAtMs ? fs.Timestamp.fromMillis(G.openAtMs) : null, contact: { phone: normalizePhone(G.contact?.phone), name: user.displayName || "", email: user.email || "" },
-    discountCode: G.discountCode || "", discountOff: off, price: total, receipt: G.receipt || "", photoCount: photos.filter(p => !p.gone).length, lang, updatedAt: fs.serverTimestamp() };
+    hideCredit: G.type === "company" && !!G.hideCredit, discountCode: G.discountCode || "", discountOff: off, price: total, receipt: G.receipt || "", photoCount: photos.filter(p => !p.gone).length, lang, updatedAt: fs.serverTimestamp() };
   if (submit) data.submittedAt = fs.serverTimestamp();
   if (!G.id) { G.id = randomId(10); data.createdAt = fs.serverTimestamp(); data.status = "draft"; await fs.setDoc(fs.doc(db, "galleries", G.id), data); if (submit) await fs.updateDoc(fs.doc(db, "galleries", G.id), { status: "pending", submittedAt: fs.serverTimestamp() }); }
   else await fs.updateDoc(fs.doc(db, "galleries", G.id), data);
