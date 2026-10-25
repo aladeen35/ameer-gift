@@ -24,14 +24,18 @@ fs.mkdirSync(path.join(OUT, "avatars"), { recursive: true });
 // Modest, Gulf/Sudan-friendly selection. `g` picks the animation set (male / female clips).
 export const AVATARS = [
   { id: "m-thobe-shemagh", src: "Adults/Male_Adult_19", g: "m", kind: "man" },
+  { id: "m-sudan-jalabiya", src: "Adults/Male_Adult_15", g: "m", kind: "man", accessory: "imma", recolor: { skin: 0.5, capWhite: true } },
   { id: "m-thobe-ghutra", src: "Adults/Male_Adult_21", g: "m", kind: "man" },
   { id: "m-thobe-kufi", src: "Adults/Male_Adult_15", g: "m", kind: "man" },
   { id: "m-shirt-blue", src: "Adults/Male_Adult_08", g: "m", kind: "man" },
   { id: "m-shirt-khaki", src: "Adults/Male_Adult_14", g: "m", kind: "man" },
   { id: "f-hijab-white", src: "Adults/Female_Adult_06", g: "f", kind: "woman" },
+  { id: "f-sudan-toub-orange", src: "Adults/Female_Adult_06", g: "f", kind: "woman", recolor: { skin: 0.52, toub: ["#C8501E", "#F2C14E"] } },
+  { id: "f-sudan-toub-teal", src: "Adults/Female_Adult_06", g: "f", kind: "woman", recolor: { skin: 0.42, toub: ["#0F6E6A", "#E9C46A"] } },
   { id: "f-abaya-black", src: "Adults/Female_Adult_10", g: "f", kind: "woman" },
   { id: "f-coat-grey", src: "Adults/Female_Adult_09", g: "f", kind: "woman" },
   { id: "f-coat-beige", src: "Adults/Female_Adult_14", g: "f", kind: "woman" },
+  // Sudanese characters, derived from the avatars above: jalabiya + imma (turban added in the app), and a toub in two colours
   { id: "b-blue", src: "Children/Male_Child_01", g: "m", kind: "boy" },
   { id: "b-orange", src: "Children/Male_Child_02", g: "m", kind: "boy" },
   { id: "g-hijab-green", src: "Children/Female_Child_02", g: "f", kind: "girl" },
@@ -83,8 +87,42 @@ function decodeTGA(b) {
   }
   return { data: out, width: w, height: h };
 }
-async function tgaToWebP(buf, size, { alpha = false, quality = 80, normal = false } = {}) {
-  const { data, width, height } = decodeTGA(buf);
+// Recolouring for the Sudanese variants: darker skin, toub fabric with a woven gold motif, white cap under the imma
+function hsv(r, g, b) { const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; let h = 0; if (d) { h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; if (h < 0) h += 360; } return [h, mx ? d / mx : 0, mx / 255]; }
+const hex = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
+function recolor(img, rc, role) {
+  const { data, width: w, height: h } = img;
+  const [base, accent] = rc.toub ? rc.toub.map(hex) : [null, null];
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const i = (y * w + x) * 4; if (data[i + 3] === 0 && role !== "opacity") continue;
+    const r = data[i], g = data[i + 1], b = data[i + 2]; const [hu, sa, va] = hsv(r, g, b);
+    const u = x / w, v = y / h;
+    const skin = role !== "opacity" && hu < 45 && sa > 0.16 && sa < 0.85 && va > 0.12;
+    let cloth = false, ref = 0.8;
+    if (base) {
+      if (role === "body" && hu >= 40 && hu <= 95 && sa > 0.12) { cloth = true; ref = 0.5; }
+      if (role === "head" && sa < 0.24 && va > 0.42 && !(u < 0.36 && v > 0.82)) { cloth = true; ref = 0.85; }
+      if (role === "body" && sa < 0.2 && va > 0.55 && !skin) { cloth = true; ref = 0.85; }
+      if (role === "opacity") { cloth = true; ref = 0.85; }
+    }
+    if (cloth) {
+      const shade = Math.min(1.25, va / ref);
+      // woven motif: fine diagonal gold threads + small diamonds on a grid
+      const d1 = (x + y) % 22 < 2, d2 = Math.abs(((x % 28) - 14)) + Math.abs(((y % 28) - 14)) < 4;
+      const c = d1 || d2 ? accent : base;
+      data[i] = Math.min(255, c[0] * shade); data[i + 1] = Math.min(255, c[1] * shade); data[i + 2] = Math.min(255, c[2] * shade);
+      continue;
+    }
+    if (rc.capWhite && role === "head" && v > 0.79 && !skin && va > 0.18) { const l = Math.min(255, 150 + va * 110); data[i] = l; data[i + 1] = l; data[i + 2] = l * 0.98; continue; }
+    if (skin && rc.skin) {
+      const k = rc.skin, sat = 1.12;
+      const m = (r + g + b) / 3; data[i] = Math.min(255, (m + (r - m) * sat) * k); data[i + 1] = Math.min(255, (m + (g - m) * sat) * k * 0.97); data[i + 2] = Math.min(255, (m + (b - m) * sat) * k * 0.92);
+    }
+  }
+  return img;
+}
+async function tgaToWebP(buf, size, { alpha = false, quality = 80, normal = false, rc = null, role = "" } = {}) {
+  const { data, width, height } = rc ? recolor(decodeTGA(buf), rc, role) : decodeTGA(buf);
   let img = sharp(data, { raw: { width, height, channels: 4 } }).resize(size, size, { fit: "fill" });
   if (!alpha) img = img.removeAlpha();
   return img.webp({ quality: normal ? 90 : quality, alphaQuality: 90, effort: 6 }).toBuffer();
@@ -139,7 +177,8 @@ async function buildAvatar(a) {
     const isOpacity = /opacity/i.test(base);
     const color = await fetchCached(`Assets/Avatars/${a.src}/Textures/${base}_color.tga`);
     if (color) {
-      const tex = doc.createTexture(base + "_c").setMimeType("image/webp").setImage(await tgaToWebP(color, isOpacity ? 512 : /head/.test(base) ? 512 : 1024, { alpha: isOpacity }));
+      const role = isOpacity ? "opacity" : /head/.test(base) ? "head" : "body";
+      const tex = doc.createTexture(base + "_c").setMimeType("image/webp").setImage(await tgaToWebP(color, isOpacity ? 512 : role === "head" ? 512 : 1024, { alpha: isOpacity, rc: a.recolor, role }));
       mat.setBaseColorTexture(tex);
     }
     if (isOpacity) { mat.setAlphaMode("MASK").setAlphaCutoff(0.4).setDoubleSided(true); }
@@ -153,7 +192,7 @@ async function buildAvatar(a) {
   await io.write(out, doc);
   // hip height (Bip01 rest Y) lets the app rescale shared clips for children
   let hip = 0; obj.traverse(o => { if (o.isBone && o.name === "Bip01") hip = o.getWorldPosition(new THREE.Vector3()).y; });
-  return { id: a.id, kind: a.kind, g: a.g, file: `models/avatars/${a.id}.glb`, tris: Math.round(tris), kb: Math.round(fs.statSync(out).size / 1024), hip: +hip.toFixed(3), src: a.src };
+  return { id: a.id, kind: a.kind, g: a.g, ...(a.accessory ? { accessory: a.accessory } : {}), file: `models/avatars/${a.id}.glb`, tris: Math.round(tris), kb: Math.round(fs.statSync(out).size / 1024), hip: +hip.toFixed(3), src: a.src };
 }
 
 /* ---------- animation clips (one file per gender) ---------- */

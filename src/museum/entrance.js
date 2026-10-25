@@ -60,6 +60,7 @@ export function buildEntrance({ C, quality, title }) {
   S.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(ap), 120, 0.07, 8, false), gold));
   const ty = new THREE.Shape(); ty.moveTo(-AW / 2, AS); archPts(AW, AS, AP).forEach(v => ty.lineTo(v.x, v.y)); ty.closePath();
   const tm = new THREE.Mesh(new THREE.ShapeGeometry(ty), mat(C.trim, { roughness: 0.7 })); tm.position.z = -0.42; S.add(tm);
+  const gapCover = new THREE.Mesh(new THREE.PlaneGeometry(0.1, AS), mat(C.trim2, { roughness: 0.6 })); gapCover.position.set(0, AS / 2, -0.5); S.add(gapCover); // hides the light between the closed door leaves
   const seam = new THREE.Mesh(new THREE.PlaneGeometry(0.12, AP - AS + 0.2), mat(C.trim, { roughness: 0.7 })); seam.position.set(0, (AS + AP) / 2, -0.415); S.add(seam);
   const st = new THREE.Mesh(new THREE.CircleGeometry(0.28, 8), gold); st.position.set(0, AS + 0.5, -0.4); S.add(st);
   const [ic, ig] = cv(64, 256); const igr = ig.createLinearGradient(0, 0, 0, 256); igr.addColorStop(0, "#FFF3D6"); igr.addColorStop(1, "#F2D99A"); ig.fillStyle = igr; ig.fillRect(0, 0, 64, 256);

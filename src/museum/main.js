@@ -671,4 +671,4 @@ function shotMode() {
 /* ---------- start ---------- */
 resize(); frame();
 boot().catch(e => { console.error(e); fatal(t("loadErr")); });
-window.__ag = { S, P, me, get my() { return my; }, Q, hall: () => hall }; // for automated tests
+window.__ag = { S, P, me, get my() { return my; }, Q, hall: () => hall, entrance: () => entrance, camIntro, THREE }; // for automated tests // for automated tests

@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils.js";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { canvasTex, blobShadow, makeLabel } from "./textures.js";
 import { OPT } from "./i18n.js";
 
@@ -83,6 +84,39 @@ function worldRotate(bone, axis, angle) {
   bone.quaternion.premultiply(tmpQ.clone().invert().multiply(tmpQ2).multiply(tmpQ));
 }
 
+// Sudanese imma: a white turban wound in layers, fixed to the head bone so it follows every movement
+let immaGeo = null, immaMat = null;
+function immaParts() {
+  if (immaGeo) return [immaGeo, immaMat];
+  const c = document.createElement("canvas"); c.width = 64; c.height = 256; const g = c.getContext("2d");
+  g.fillStyle = "#F7F6F1"; g.fillRect(0, 0, 64, 256);
+  for (let y = 0; y < 256; y += 3) { g.fillStyle = `rgba(150,145,135,${0.05 + Math.random() * 0.12})`; g.fillRect(0, y, 64, 1); } // fabric folds
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  immaMat = new THREE.MeshStandardMaterial({ map: tex, color: 0xffffff, roughness: 0.9 });
+  const parts = [];
+  // wraps: tori stacked and slightly tilted, wider at the middle
+  // a wide, low wrap: round band over the forehead, a second band crossing it, a soft crown
+  const wraps = [[0.098, 0.028, 0.0, 0.0], [0.101, 0.03, 0.035, 0.18], [0.096, 0.028, 0.065, -0.16], [0.08, 0.026, 0.09, 0.1]];
+  for (const [R, r, y, tilt] of wraps) { const t = new THREE.TorusGeometry(R, r, 10, 40); t.rotateX(Math.PI / 2); t.rotateZ(tilt * 0.4); t.translate(0, y, 0); parts.push(t); }
+  const dome = new THREE.SphereGeometry(0.093, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2); dome.scale(1, 0.62, 1.05); dome.translate(0, 0.075, 0); parts.push(dome);
+  const tail = new THREE.CylinderGeometry(0.026, 0.02, 0.1, 8); tail.rotateX(0.5); tail.translate(0, 0.04, -0.1); parts.push(tail);
+  immaGeo = mergeGeometries(parts.map(p => p.toNonIndexed()));
+  immaGeo.computeVertexNormals();
+  return [immaGeo, immaMat];
+}
+function attachImma(obj) {
+  let head = null, neck = null; obj.traverse(o => { if (o.isBone && o.name === "Bip01_Head") head = o; if (o.isBone && o.name === "Bip01_Neck") neck = o; });
+  if (!head) return;
+  obj.updateMatrixWorld(true);
+  const hp = head.getWorldPosition(new THREE.Vector3()), np = neck ? neck.getWorldPosition(new THREE.Vector3()) : hp.clone().add(new THREE.Vector3(0, -0.08, 0));
+  const up = hp.clone().sub(np).normalize(); if (up.y < 0.5) up.set(0, 1, 0);
+  const [geo, mat] = immaParts();
+  const t = new THREE.Mesh(geo, mat); t.name = "imma"; t.castShadow = true; t.frustumCulled = false;
+  // the band sits on the forehead line, about 13 cm above the head bone pivot, slightly back
+  t.position.copy(hp).addScaledVector(up, 0.135).add(new THREE.Vector3(0, 0, -0.018));
+  obj.add(t); t.updateMatrixWorld(true); head.attach(t);
+}
+
 /* ---------- one avatar in the world ---------- */
 export class Avatar {
   // spec: {kind, id (real variant), look:[skin,hair,outfit] (lite), h (height scale), name, photo}
@@ -112,6 +146,7 @@ export class Avatar {
     this._clear();
     const obj = SkeletonUtils.clone(gltf.scene);
     obj.traverse(o => { if (o.isMesh) { o.frustumCulled = false; o.castShadow = this.shadows; o.receiveShadow = false; const ms = Array.isArray(o.material) ? o.material : [o.material]; ms.forEach(m => { m.envMapIntensity = 0.7; if (m.alphaTest) { m.transparent = true; m.alphaTest = 0.04; m.depthWrite = true; } }); } });
+    if (info.accessory === "imma") attachImma(obj);
     this.model.add(obj); this.real = true; this.info = info;
     this.mixer = new THREE.AnimationMixer(obj); this.actions = {}; this.meta = meta;
     const ratio = info.hip && meta.idle?.hip ? info.hip / meta.idle.hip : 1;

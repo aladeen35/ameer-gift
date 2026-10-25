@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-25T00:46:27.284Z",
+ "generated": "2026-10-25T01:25:43.196Z",
  "avatars": [
   {
    "id": "m-thobe-shemagh",
@@ -10,6 +10,17 @@
    "kb": 424,
    "hip": 0.895,
    "src": "Adults/Male_Adult_19"
+  },
+  {
+   "id": "m-sudan-jalabiya",
+   "kind": "man",
+   "g": "m",
+   "accessory": "imma",
+   "file": "models/avatars/m-sudan-jalabiya.glb",
+   "tris": 7292,
+   "kb": 298,
+   "hip": 0.895,
+   "src": "Adults/Male_Adult_15"
   },
   {
    "id": "m-thobe-ghutra",
@@ -58,6 +69,26 @@
    "file": "models/avatars/f-hijab-white.glb",
    "tris": 6992,
    "kb": 436,
+   "hip": 0.923,
+   "src": "Adults/Female_Adult_06"
+  },
+  {
+   "id": "f-sudan-toub-orange",
+   "kind": "woman",
+   "g": "f",
+   "file": "models/avatars/f-sudan-toub-orange.glb",
+   "tris": 6992,
+   "kb": 657,
+   "hip": 0.923,
+   "src": "Adults/Female_Adult_06"
+  },
+  {
+   "id": "f-sudan-toub-teal",
+   "kind": "woman",
+   "g": "f",
+   "file": "models/avatars/f-sudan-toub-teal.glb",
+   "tris": 6992,
+   "kb": 726,
    "hip": 0.923,
    "src": "Adults/Female_Adult_06"
   },

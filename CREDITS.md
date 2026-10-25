@@ -7,6 +7,7 @@ Every third-party library and asset shipped with Ameer Gift. The same list is sh
 | Asset | Author | Source | License | Used for |
 |---|---|---|---|---|
 | Microsoft Rocketbox Avatar Library (13 avatars: Male_Adult_08/14/15/19/21, Female_Adult_06/09/10/14, Male_Child_01/02, Female_Child_01/02) | Microsoft Research, Rocketbox | https://github.com/microsoft/Microsoft-Rocketbox | MIT | Realistic avatars (`public/models/avatars/`) |
+| Sudanese looks (jalabiya with imma, toub in orange and teal) | Derived from Rocketbox Male_Adult_15 and Female_Adult_06 (recoloured textures; the imma is modelled in code) | https://github.com/microsoft/Microsoft-Rocketbox | MIT | `m-sudan-jalabiya`, `f-sudan-toub-*` |
 | Rocketbox animation library (idle, look around, walk, slow run, wave, clap, sit; male and female) | Microsoft Research, Rocketbox | https://github.com/microsoft/Microsoft-Rocketbox/tree/master/Assets/Animations | MIT | Motion-capture clips (`public/models/anims-*.glb`) |
 | Ultimate Modular Men / Women | Quaternius | https://quaternius.com | CC0 1.0 | Light characters for low-end phones (`public/models/lite/`) |
 
