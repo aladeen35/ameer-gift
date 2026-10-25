@@ -24,14 +24,14 @@ fs.mkdirSync(path.join(OUT, "avatars"), { recursive: true });
 // Modest, Gulf/Sudan-friendly selection. `g` picks the animation set (male / female clips).
 export const AVATARS = [
   { id: "m-thobe-shemagh", src: "Adults/Male_Adult_19", g: "m", kind: "man" },
-  { id: "m-sudan-jalabiya", src: "Adults/Male_Adult_15", g: "m", kind: "man", accessory: "imma", recolor: { skin: 0.5, capWhite: true } },
+  { id: "m-sudan-jalabiya", src: "Adults/Male_Adult_15", g: "m", kind: "man", accessory: "imma", recolor: { skin: 0.68, capWhite: true } },
   { id: "m-thobe-ghutra", src: "Adults/Male_Adult_21", g: "m", kind: "man" },
   { id: "m-thobe-kufi", src: "Adults/Male_Adult_15", g: "m", kind: "man" },
   { id: "m-shirt-blue", src: "Adults/Male_Adult_08", g: "m", kind: "man" },
   { id: "m-shirt-khaki", src: "Adults/Male_Adult_14", g: "m", kind: "man" },
   { id: "f-hijab-white", src: "Adults/Female_Adult_06", g: "f", kind: "woman" },
-  { id: "f-sudan-toub-orange", src: "Adults/Female_Adult_06", g: "f", kind: "woman", recolor: { skin: 0.52, toub: ["#C8501E", "#F2C14E"] } },
-  { id: "f-sudan-toub-teal", src: "Adults/Female_Adult_06", g: "f", kind: "woman", recolor: { skin: 0.42, toub: ["#0F6E6A", "#E9C46A"] } },
+  { id: "f-sudan-toub-orange", src: "Adults/Female_Adult_06", g: "f", kind: "woman", recolor: { skin: 0.62, toub: ["#C8501E", "#F2C14E"] } },
+  { id: "f-sudan-toub-teal", src: "Adults/Female_Adult_06", g: "f", kind: "woman", recolor: { skin: 0.56, toub: ["#0F6E6A", "#E9C46A"] } },
   { id: "f-abaya-black", src: "Adults/Female_Adult_10", g: "f", kind: "woman" },
   { id: "f-coat-grey", src: "Adults/Female_Adult_09", g: "f", kind: "woman" },
   { id: "f-coat-beige", src: "Adults/Female_Adult_14", g: "f", kind: "woman" },
