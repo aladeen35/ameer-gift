@@ -142,6 +142,9 @@ au.onAuthStateChanged(auth, async u => {
   }
 });
 
+// slow or blocked network: show the sign-in card instead of an endless spinner
+setTimeout(() => { if (!user && !$("#boot").classList.contains("hidden")) view("vLogin"); }, 8000);
+
 /* ---------- tabs ---------- */
 function allowedTabs() { return role === "admin" ? ["dash", "orders", "trials", "pricing", "codes", "feedback", "comments", "log", "team"] : ["trials"]; }
 function renderTabs() { $("#tabs").replaceChildren(...allowedTabs().map(k => { const b = el("button", { "aria-pressed": String(tab === k), onclick: () => { tab = k; renderTabs(); render(); } }, t("tabs")[k]);

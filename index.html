@@ -253,6 +253,8 @@ au.onAuthStateChanged(auth, async u => {
   pricing = pricing || await loadPricing();
   show("vHome"); renderList();
 });
+// slow or blocked network: don't leave the visitor on a spinner, show the sign-in card
+setTimeout(() => { if (!user && !$("#boot").classList.contains("hidden")) { $("#boot").classList.add("hidden"); show("vLanding"); } }, 8000);
 function show(id) { ["vLanding", "vHome", "vWizard"].forEach(v => $("#" + v).classList.toggle("hidden", v !== id)); scrollTo(0, 0); }
 
 /* ---------- my museums ---------- */
