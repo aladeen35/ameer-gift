@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>لوحة الإدارة — هدايا أمير</title>
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#13294B">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Reem+Kufi:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:12px 0 4px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:none;height:38px;padding:0 14px;border-radius:19px;border:1px solid var(--line);background:var(--surface);font-size:14px;font-weight:500;color:var(--muted)}
+.tabs button[aria-pressed="true"]{background:var(--btn-bg);color:var(--btn-ink);border-color:transparent}
+.tabs .badge{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:10px;background:var(--bad);color:#fff;font-size:12px;margin-inline-start:6px;padding:0 5px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (min-width:640px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
+.stat b{display:block;font-family:var(--font-display);font-size:28px;font-weight:600;line-height:1.2}
+.stat span{font-size:13px;color:var(--muted)}
+.stat.hl{background:var(--gold-soft);border-color:transparent}
+.bars{display:flex;align-items:flex-end;gap:4px;height:90px;margin-top:10px}
+.bars i{flex:1;background:var(--gold-2);border-radius:4px 4px 0 0;min-height:2px}
+.barlbl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px}
+.ocard{display:grid;gap:10px}
+.ocard .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.rc{width:84px;height:84px;object-fit:cover;border-radius:10px;cursor:zoom-in;border:1px solid var(--line)}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.pin{font-family:var(--font-display);font-size:26px;letter-spacing:.3em;direction:ltr;font-weight:600}
+.pkg{display:grid;gap:8px;padding:12px;border:1px solid var(--line);border-radius:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.grid3 label.f,.row2 label.f{margin-bottom:0}
+.lst{display:grid;gap:10px}
+.line{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.center{text-align:center;padding:40px 0}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <span class="logo-chip"><img class="logo" src="logo-full.png" alt="هدايا أمير"></span>
+  <b id="barTitle" style="font-family:var(--font-display);font-size:17px"></b>
+  <span class="grow"></span>
+  <button class="iconbtn" id="langBtn">EN</button>
+  <button class="iconbtn hidden" id="outBtn"></button>
+</div></header>
+
+<main class="wrap" style="padding-bottom:60px">
+  <div id="boot" class="center"><span class="spinner"></span></div>
+
+  <section id="vLogin" class="hidden" style="max-width:420px;margin:30px auto">
+    <div class="card stack">
+      <h1 style="font-size:22px" data-t="loginH"></h1>
+      <button class="btn ghost block" id="gBtn" data-t="google"></button>
+      <form id="eForm" class="stack" style="gap:0" novalidate>
+        <label class="f"><span data-t="email"></span><input class="in" id="eMail" type="email" dir="ltr" autocomplete="email"></label>
+        <label class="f"><span data-t="password"></span><input class="in" id="ePass" type="password" dir="ltr" autocomplete="current-password"></label>
+        <button class="btn block" data-t="signin"></button>
+      </form>
+    </div>
+  </section>
+
+  <section id="vGate" class="hidden" style="max-width:460px;margin:30px auto"><div class="card stack" id="gateBox"></div></section>
+
+  <section id="vApp" class="hidden">
+    <nav class="tabs" id="tabs" aria-label="sections"></nav>
+    <div id="pane" style="margin-top:12px"></div>
+  </section>
+</main>
+<dialog id="dlg"><div class="dbody" id="dlgBody"></div></dialog>
+
+<script type="module">
+import { auth, db, fs, au, googleSignIn, $, $$, el, toast, normalizePhone, phoneOk, fmtNum, CURRENCIES, money, randomId, randomPin, vaultKey,
+  DEFAULT_PRICING, loadPricing, museumUrl, waShare, authError } from "./shared.js";
+
+let lang = localStorage.getItem("ag-lang") || (/^ar/i.test(navigator.language) ? "ar" : "en");
+const T = {
+ ar:{bar:"لوحة الإدارة",loginH:"دخول فريق هدايا أمير",google:"الدخول بحساب Google",email:"البريد الإلكتروني",password:"كلمة المرور",signin:"دخول",out:"خروج",
+  bootH:"أهلًا بك، أنت أول من يدخل",bootP:"فعّل حسابك كمدير رئيسي. بعد ذلك تضيف بقية الفريق من تبويب «الفريق».",bootBtn:"تفعيل حسابي كمدير رئيسي",
+  reqH:"حسابك ليس ضمن الفريق بعد",reqP:"أرسل طلب انضمام، وسيفعّله المدير.",reqBtn:"إرسال طلب انضمام",reqSent:"تم إرسال طلبك، انتظر التفعيل.",
+  tabs:{dash:"الأرقام",orders:"الطلبات",trials:"التجارب",pricing:"الأسعار",codes:"أكواد الخصم",feedback:"الآراء والشكاوى",team:"الفريق"},
+  galleries:"كل المعارض",pending:"بانتظار التحقق",active:"مفعّلة",drafts:"مسودات",rejected:"مرفوضة",revenue:"المبيعات",thisMonth:"هذا الشهر",trials:"تجارب مرسلة",converted:"تجارب تحولت لشراء",complaints:"شكاوى مفتوحة",feedbacks:"كل الآراء",last14:"الطلبات المرسلة آخر ١٤ يومًا",companies:"معارض شركات",
+  st:{draft:"مسودة",pending:"بانتظار التحقق",active:"مفعّل",rejected:"مرفوض"},all:"الكل",customer:"العميل",phone:"الجوال",pkg:"الباقة",visitors:"الزوار",rooms:"القاعات",photos:"الصور",price:"المبلغ",code:"كود الخصم",opens:"الفتح",now:"فور التفعيل",receipt:"الإشعار",noReceipt:"لا يوجد إشعار",
+  activate:"تأكيد الدفع وتفعيل",reject:"رفض",rejectQ:"سبب الرفض (يظهر للعميل):",activating:"جارٍ التفعيل…",activated:"تم التفعيل",sendCust:"إرسال للعميل واتساب",link:"الرابط",pinL:"رمز الدخول",copy:"نسخ",copied:"تم النسخ",none:"لا توجد عناصر",
+  trialH:"إرسال تجربة لمدة ساعة",trialP:"تُرسل باسم هدايا أمير ومعظم المميزات، ولا تتكرر لنفس رقم الجوال.",custName:"اسم العميل",custPhone:"جوال العميل مع رمز الدولة",createTrial:"إنشاء التجربة",trialUsed:"هذا الرقم حصل على تجربة من قبل",trialOk:"تم إنشاء التجربة، أرسلها الآن",recentTrials:"آخر التجارب",expired:"منتهية",live:"فعّالة",by:"بواسطة",
+  pkgs:"الباقات",addPkg:"إضافة باقة",nameAr:"الاسم بالعربي",nameEn:"الاسم بالإنجليزي",months:"المدة بالأشهر",biz:"باقة شركات",side:"سعر الغرفة الجانبية",bank:"بيانات التحويل",bankName:"البنك",holder:"اسم صاحب الحساب",account:"رقم الحساب",note:"ملاحظة للعميل",save:"حفظ",savedOk:"تم الحفظ",removePkg:"حذف الباقة",
+  newCode:"كود جديد",codeL:"الكود",type:"النوع",percent:"نسبة %",amount:"مبلغ ثابت",value:"القيمة",currency:"العملة",maxUses:"عدد الاستخدامات (فارغ = بلا حد)",expires:"ينتهي في (اختياري)",create:"إنشاء",used:"استُخدم",disable:"إيقاف",enable:"تفعيل",del:"حذف",delQ:"تأكيد الحذف؟",exists:"هذا الكود موجود",badCodeName:"الكود حروف إنجليزية وأرقام فقط",
+  fb:{feedback:"رأي",suggestion:"اقتراح",complaint:"شكوى"},resolve:"تم الحل",reopen:"إعادة فتح",resolved:"محلولة",anon:"بدون اسم",onlyComplaints:"الشكاوى فقط",
+  members:"أعضاء الفريق",requests:"طلبات الانضمام",role:{admin:"مدير",staff:"موظف",marketer:"مسوق"},approveAs:"قبول كـ",remove:"إزالة",you:"(أنت)",noPerm:"لا تملك صلاحية لهذه العملية",err:"حدث خطأ"},
+ en:{bar:"Admin",loginH:"Ameer Gift team sign-in",google:"Sign in with Google",email:"Email",password:"Password",signin:"Sign in",out:"Sign out",
+  bootH:"Welcome, you are the first one here",bootP:"Activate your account as the main admin. Then add the rest of the team from the Team tab.",bootBtn:"Make me the main admin",
+  reqH:"Your account is not on the team yet",reqP:"Send a join request and an admin will approve it.",reqBtn:"Send join request",reqSent:"Request sent, wait for approval.",
+  tabs:{dash:"Numbers",orders:"Orders",trials:"Trials",pricing:"Pricing",codes:"Discount codes",feedback:"Feedback",team:"Team"},
+  galleries:"All museums",pending:"Awaiting check",active:"Active",drafts:"Drafts",rejected:"Rejected",revenue:"Sales",thisMonth:"This month",trials:"Trials sent",converted:"Trials that bought",complaints:"Open complaints",feedbacks:"All feedback",last14:"Orders sent in the last 14 days",companies:"Company museums",
+  st:{draft:"Draft",pending:"Awaiting check",active:"Active",rejected:"Rejected"},all:"All",customer:"Customer",phone:"Mobile",pkg:"Package",visitors:"Visitors",rooms:"Halls",photos:"Photos",price:"Amount",code:"Discount code",opens:"Opens",now:"On activation",receipt:"Receipt",noReceipt:"No receipt",
+  activate:"Confirm payment & activate",reject:"Reject",rejectQ:"Rejection reason (shown to the customer):",activating:"Activating…",activated:"Activated",sendCust:"Send to customer on WhatsApp",link:"Link",pinL:"Access code",copy:"Copy",copied:"Copied",none:"Nothing here",
+  trialH:"Send a one-hour trial",trialP:"Sent under the Ameer Gift name with most features, once per mobile number.",custName:"Customer name",custPhone:"Customer mobile with country code",createTrial:"Create trial",trialUsed:"This number already had a trial",trialOk:"Trial created, send it now",recentTrials:"Recent trials",expired:"Expired",live:"Live",by:"by",
+  pkgs:"Packages",addPkg:"Add package",nameAr:"Arabic name",nameEn:"English name",months:"Months",biz:"Company package",side:"Side room price",bank:"Transfer details",bankName:"Bank",holder:"Account holder",account:"Account number",note:"Note for customers",save:"Save",savedOk:"Saved",removePkg:"Remove package",
+  newCode:"New code",codeL:"Code",type:"Type",percent:"Percent %",amount:"Fixed amount",value:"Value",currency:"Currency",maxUses:"Max uses (empty = unlimited)",expires:"Expires on (optional)",create:"Create",used:"Used",disable:"Disable",enable:"Enable",del:"Delete",delQ:"Delete for sure?",exists:"This code exists",badCodeName:"Use English letters and digits only",
+  fb:{feedback:"Opinion",suggestion:"Suggestion",complaint:"Complaint"},resolve:"Resolved",reopen:"Reopen",resolved:"Resolved",anon:"No name",onlyComplaints:"Complaints only",
+  members:"Team members",requests:"Join requests",role:{admin:"Admin",staff:"Staff",marketer:"Marketer"},approveAs:"Approve as",remove:"Remove",you:"(you)",noPerm:"You don't have permission for this",err:"Something went wrong"}};
+const t = k => T[lang][k];
+let user = null, role = "", tab = "dash", cache = {};
+
+function applyLang() { document.documentElement.lang = lang; document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+  $$("[data-t]").forEach(e => { const v = t(e.dataset.t); if (typeof v === "string") e.textContent = v; });
+  $("#langBtn").textContent = lang === "ar" ? "EN" : "عربي"; $("#outBtn").textContent = t("out"); $("#barTitle").textContent = t("bar"); if (role) { renderTabs(); render(); } }
+$("#langBtn").onclick = () => { lang = lang === "ar" ? "en" : "ar"; localStorage.setItem("ag-lang", lang); applyLang(); };
+$("#gBtn").onclick = async () => { try { await googleSignIn(); } catch (e) { toast(authError(e, lang), "bad"); } };
+$("#eForm").onsubmit = async ev => { ev.preventDefault(); try { await au.signInWithEmailAndPassword(auth, $("#eMail").value.trim(), $("#ePass").value); } catch (e) { toast(authError(e, lang), "bad"); } };
+$("#outBtn").onclick = () => au.signOut(auth);
+function view(id) { ["boot", "vLogin", "vGate", "vApp"].forEach(v => $("#" + v).classList.toggle("hidden", v !== id)); }
+
+au.onAuthStateChanged(auth, async u => {
+  user = u; role = ""; $("#outBtn").classList.toggle("hidden", !u);
+  if (!u) return view("vLogin");
+  view("boot");
+  try { const r = await fs.getDoc(fs.doc(db, "roles", u.uid)); if (r.exists()) role = r.data().role; } catch (e) {}
+  if (role) { tab = role === "admin" ? "dash" : "trials"; view("vApp"); renderTabs(); render(); return; }
+  let booted = true; try { booted = (await fs.getDoc(fs.doc(db, "config", "bootstrap"))).exists(); } catch (e) {}
+  const box = $("#gateBox"); view("vGate");
+  if (!booted) {
+    box.replaceChildren(el("h2", { style: "font-size:21px", text: t("bootH") }), el("p", { class: "muted", style: "margin:0", text: t("bootP") }),
+      el("button", { class: "btn gold", text: t("bootBtn"), onclick: async () => {
+        try { const b = fs.writeBatch(db); b.set(fs.doc(db, "roles", u.uid), { role: "admin", name: u.displayName || "", email: u.email || "", at: fs.serverTimestamp() });
+          b.set(fs.doc(db, "config", "bootstrap"), { by: u.uid, at: fs.serverTimestamp() }); await b.commit(); location.reload(); }
+        catch (e) { toast(t("noPerm") + " " + (e.code || ""), "bad"); } } }));
+  } else {
+    box.replaceChildren(el("h2", { style: "font-size:21px", text: t("reqH") }), el("p", { class: "muted", style: "margin:0", text: t("reqP") }),
+      el("button", { class: "btn", text: t("reqBtn"), onclick: async () => {
+        try { await fs.setDoc(fs.doc(db, "staffRequests", u.uid), { name: u.displayName || "", email: u.email || "", at: fs.serverTimestamp() }); toast(t("reqSent")); } catch (e) { toast(t("err"), "bad"); } } }));
+  }
+});
+
+/* ---------- tabs ---------- */
+function allowedTabs() { return role === "admin" ? ["dash", "orders", "trials", "pricing", "codes", "feedback", "team"] : ["trials"]; }
+function renderTabs() { $("#tabs").replaceChildren(...allowedTabs().map(k => { const b = el("button", { "aria-pressed": String(tab === k), onclick: () => { tab = k; renderTabs(); render(); } }, t("tabs")[k]);
+  if (k === "orders" && cache.pendingCount) b.append(el("span", { class: "badge", text: fmtNum(cache.pendingCount, lang) })); return b; })); }
+async function render() { const p = $("#pane"); p.replaceChildren(el("div", { class: "center" }, el("span", { class: "spinner" })));
+  try { await ({ dash, orders, trials, pricing: pricingTab, codes, feedback, team })[tab](p); } catch (e) { console.error(e); p.replaceChildren(el("p", { class: "muted", text: (e.code === "permission-denied" ? t("noPerm") : t("err")) + " " + (e.code || "") })); } }
+async function getAll(path) { const s = await fs.getDocs(fs.collection(db, path)); return s.docs.map(d => ({ id: d.id, ...d.data() })); }
+const ms = x => x?.toMillis?.() || 0;
+function fmtDate(x, withTime = true) { const d = x?.toDate ? x.toDate() : (x instanceof Date ? x : null); if (!d) return "—";
+  return new Intl.DateTimeFormat(lang === "ar" ? "ar-EG" : "en-GB", withTime ? { dateStyle: "medium", timeStyle: "short" } : { dateStyle: "medium" }).format(d); }
+async function copy(s) { try { await navigator.clipboard.writeText(s); toast(t("copied")); } catch (e) { prompt("", s); } }
+const stat = (n, l, hl) => el("div", { class: "stat" + (hl ? " hl" : "") }, el("b", { text: n }), el("span", { text: l }));
+const sec = (title, ...kids) => el("div", { class: "card stack", style: "margin-bottom:14px" }, el("h2", { style: "font-size:18px", text: title }), ...kids);
+
+/* ---------- dashboard ---------- */
+async function dash(p) {
+  const [gs, fb, tr] = await Promise.all([getAll("galleries"), getAll("feedback"), getAll("trials").catch(() => [])]);
+  const by = s => gs.filter(g => g.status === s); cache.pendingCount = by("pending").length; renderTabs();
+  const act = by("active"); const rev = {}, revM = {}; const m0 = new Date(); m0.setDate(1); m0.setHours(0, 0, 0, 0);
+  for (const g of act) { rev[g.currency] = (rev[g.currency] || 0) + (g.price || 0); if (ms(g.activatedAt) >= m0.getTime()) revM[g.currency] = (revM[g.currency] || 0) + (g.price || 0); }
+  const fmtRev = r => Object.keys(r).length ? Object.entries(r).map(([c, v]) => money(v, c, lang)).join(" · ") : "—";
+  const phones = new Set(act.map(g => g.contact?.phone).filter(Boolean)); const conv = tr.filter(x => phones.has(x.id)).length;
+  const days = Array.from({ length: 14 }, (_, i) => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - 13 + i); return d.getTime(); });
+  const counts = days.map(d => gs.filter(g => { const s = ms(g.submittedAt); return s >= d && s < d + 864e5; }).length); const mx = Math.max(1, ...counts);
+  p.replaceChildren(
+    el("div", { class: "stats" }, stat(fmtNum(cache.pendingCount, lang), t("pending"), true), stat(fmtNum(act.length, lang), t("active")), stat(fmtNum(gs.length, lang), t("galleries")), stat(fmtNum(by("draft").length, lang), t("drafts")),
+      stat(fmtNum(tr.length, lang), t("trials")), stat(fmtNum(conv, lang), t("converted")), stat(fmtNum(fb.filter(f => f.type === "complaint" && !f.resolved).length, lang), t("complaints"), true), stat(fmtNum(gs.filter(g => g.type === "company").length, lang), t("companies"))),
+    el("div", { class: "card stack", style: "margin-top:14px" }, el("div", { class: "line" }, el("b", { text: t("revenue") }), el("span", { text: fmtRev(rev) })), el("div", { class: "line" }, el("span", { class: "muted", text: t("thisMonth") }), el("span", { text: fmtRev(revM) }))),
+    el("div", { class: "card", style: "margin-top:14px" }, el("b", { text: t("last14") }), el("div", { class: "bars" }, ...counts.map(c => el("i", { style: `height:${c / mx * 100}%`, title: String(c) }))),
+      el("div", { class: "barlbl" }, el("span", { text: fmtDate(new Date(days[0]), false) }), el("span", { text: fmtDate(new Date(days[13]), false) }))));
+}
+
+/* ---------- orders ---------- */
+let oFilter = "pending";
+async function orders(p) {
+  const pr = await loadPricing(); const gs = (await getAll("galleries")).sort((a, b) => ms(b.submittedAt || b.createdAt) - ms(a.submittedAt || a.createdAt));
+  cache.pendingCount = gs.filter(g => g.status === "pending").length; renderTabs();
+  const segs = ["pending", "active", "rejected", "draft", "all"];
+  const segEl = el("div", { class: "seg", style: "margin-bottom:12px;overflow-x:auto" }, ...segs.map(s => el("button", { "aria-pressed": String(oFilter === s), onclick: () => { oFilter = s; orders(p); } }, s === "all" ? t("all") : t("st")[s])));
+  const list = gs.filter(g => oFilter === "all" || g.status === oFilter);
+  const cards = await Promise.all(list.map(g => orderCard(g, pr, p)));
+  p.replaceChildren(segEl, list.length ? el("div", { class: "lst" }, ...cards) : el("p", { class: "muted", text: t("none") }));
+}
+async function orderCard(g, pr, p) {
+  const pk = pr.packages.find(x => x.id === g.packageId) || {}; const chip = { draft: "", pending: "warn", active: "ok", rejected: "bad" }[g.status];
+  const ph = g.contact?.phone || "";
+  const kv = el("dl", { class: "kv" }, ...[[t("customer"), [g.contact?.name, g.contact?.email].filter(Boolean).join(" · ") || "—"], [t("phone"), ph ? "+" + ph : "—"],
+    [t("pkg"), (lang === "ar" ? pk.nameAr : pk.nameEn) || g.packageId], [t("visitors"), fmtNum(g.visitors, lang)], [t("rooms"), fmtNum(g.sideRoom ? 2 : 1, lang)], [t("photos"), fmtNum(g.photoCount || 0, lang)],
+    [t("price"), money(g.price || 0, g.currency, lang)], [t("code"), g.discountCode || "—"], [t("opens"), g.openAt ? fmtDate(g.openAt) : t("now")]].flatMap(([k, v]) => [el("dt", { text: k }), el("dd", { text: v })]));
+  const c = el("div", { class: "card ocard" }, el("div", { class: "top" }, el("div", {}, el("h3", { style: "font-size:18px", text: g.title }), el("p", { class: "small muted", style: "margin:0", text: `${g.sender} ← ${g.recipient}` })),
+    el("span", { class: "chip " + chip, text: t("st")[g.status] })), kv);
+  if (g.company?.logo) c.append(el("img", { src: g.company.logo, alt: g.company.name || "", style: "max-height:56px;max-width:180px;background:#fff;border-radius:8px;padding:4px" }));
+  if (g.receipt) c.append(el("div", { class: "line" }, el("span", { class: "small muted", text: t("receipt") }), el("img", { class: "rc", src: g.receipt, alt: t("receipt"), onclick: () => showImg(g.receipt) })));
+  else if (g.status === "pending") c.append(el("p", { class: "small", style: "margin:0;color:var(--bad)", text: t("noReceipt") }));
+  if (g.rejectReason && g.status === "rejected") c.append(el("p", { class: "small", style: "margin:0;color:var(--bad)", text: g.rejectReason }));
+  const acts = el("div", { class: "acts" });
+  if (g.status === "pending") {
+    acts.append(el("button", { class: "btn sm gold", text: t("activate"), onclick: async e => { e.target.disabled = true; e.target.textContent = t("activating");
+      try { await activate(g); toast(t("activated")); orders(p); } catch (x) { console.error(x); toast(t("err") + " " + (x.code || x.message || ""), "bad"); e.target.disabled = false; e.target.textContent = t("activate"); } } }),
+      el("button", { class: "btn sm danger", text: t("reject"), onclick: async () => { const r = prompt(t("rejectQ")); if (r == null) return;
+        try { await fs.updateDoc(fs.doc(db, "galleries", g.id), { status: "rejected", rejectReason: r.slice(0, 200), reviewedAt: fs.serverTimestamp() }); orders(p); } catch (x) { toast(t("err"), "bad"); } } }));
+  }
+  if (g.status === "active") {
+    try { const a = await fs.getDoc(fs.doc(db, "galleries", g.id, "private", "access")); if (a.exists()) { const { pin } = a.data(); const url = museumUrl(g.id);
+      c.append(el("div", { class: "line" }, el("span", { class: "pin", text: pin }), el("button", { class: "btn sm ghost", text: t("copy"), onclick: () => copy(`${url}\n${pin}`) })));
+      acts.append(el("a", { class: "btn sm gold", target: "_blank", rel: "noopener", href: "https://wa.me/" + ph + "?text=" + encodeURIComponent(custMsg(g, url, pin)), text: t("sendCust") }),
+        el("a", { class: "btn sm ghost", target: "_blank", rel: "noopener", href: url, text: t("link") })); } } catch (e) {}
+  }
+  if (acts.childNodes.length) c.append(acts);
+  return c;
+}
+function custMsg(g, url, pin) { return (g.lang || lang) === "ar"
+  ? `مرحبًا ${g.contact?.name || ""} 🌟\nتم تفعيل معرضك «${g.title}» في هدايا أمير.\nالرابط: ${url}\nرمز الدخول: ${pin}\nأرسلهما لمن تحب 🎁`
+  : `Hello ${g.contact?.name || ""} 🌟\nYour museum "${g.title}" on Ameer Gift is active.\nLink: ${url}\nAccess code: ${pin}\nShare them with your loved ones 🎁`; }
+function showImg(src) { $("#dlgBody").replaceChildren(el("img", { class: "full", src, alt: "" }), el("button", { class: "btn block", style: "margin-top:12px", text: "✕", onclick: () => $("#dlg").close() })); $("#dlg").showModal(); }
+
+// Payment confirmed: create the private museum copy, the public teaser and the access code
+async function activate(g) {
+  const pin = randomPin(), key = await vaultKey(g.id, pin);
+  const openAt = g.openAt || fs.Timestamp.now();
+  const ph = await fs.getDocs(fs.collection(db, "galleries", g.id, "photos"));
+  await fs.setDoc(fs.doc(db, "vaults", key), { owner: g.owner, gid: g.id, status: "active", demo: false, title: g.title, recipient: g.recipient, sender: g.sender, dedication: g.dedication || "",
+    company: g.company || { name: "", logo: "" }, template: g.template || "classic", music: g.music || "", visitors: g.visitors || 4, sideRoom: !!g.sideRoom, openAt, photoCount: ph.size,
+    expiresAt: fs.Timestamp.fromMillis(openAt.toMillis() + (g.months || 12) * 30 * 864e5), createdAt: fs.serverTimestamp() });
+  for (const d of ph.docs) await fs.setDoc(fs.doc(db, "vaults", key, "photos", d.id), d.data());
+  const b = fs.writeBatch(db);
+  b.set(fs.doc(db, "teasers", g.id), { status: "active", title: g.title, recipient: g.recipient, sender: g.sender, openAt, logo: g.company?.logo || "", owner: g.owner });
+  b.set(fs.doc(db, "galleries", g.id, "private", "access"), { pin, key, at: fs.serverTimestamp() });
+  b.update(fs.doc(db, "galleries", g.id), { status: "active", activatedAt: fs.serverTimestamp(), activatedBy: user.uid, photosMoved: true });
+  if (g.discountCode) b.update(fs.doc(db, "discounts", g.discountCode), { used: fs.increment(1) });
+  await b.commit();
+  for (const d of ph.docs) await fs.deleteDoc(d.ref);
+}
+
+/* ---------- trials ---------- */
+async function trials(p) {
+  const name = el("input", { class: "in", maxlength: "40" }), phone = el("input", { class: "in", type: "tel", dir: "ltr", placeholder: "+966 5x xxx xxxx" }); const out = el("div");
+  const form = el("form", { class: "stack", style: "gap:0", novalidate: true, onsubmit: async ev => { ev.preventDefault(); const n = name.value.trim(), ph = normalizePhone(phone.value);
+    if (!n || !phoneOk(ph)) return toast(t("custName") + " / " + t("custPhone"), "bad");
+    const btn = form.querySelector("button"); btn.disabled = true;
+    try { if ((await fs.getDoc(fs.doc(db, "trials", ph))).exists()) { toast(t("trialUsed"), "bad"); return; }
+      const r = await createTrial(n, ph); name.value = ""; phone.value = ""; toast(t("trialOk"));
+      const url = museumUrl(r.gid); const msg = lang === "ar" ? `مرحبًا ${n} 🌟\nهذه تجربة مجانية لمدة ساعة من هدايا أمير، تجوّل في متحف ذكريات ثلاثي الأبعاد.\nالرابط: ${url}\nرمز الدخول: ${r.pin}` : `Hello ${n} 🌟\nHere is a free one-hour Ameer Gift trial: a 3D memories museum.\nLink: ${url}\nAccess code: ${r.pin}`;
+      out.replaceChildren(el("div", { class: "card stack", style: "background:var(--gold-soft);border:0;margin-top:12px" }, el("span", { class: "pin", text: r.pin }), el("code", { style: "direction:ltr;word-break:break-all", text: url }),
+        el("div", { class: "acts" }, el("a", { class: "btn sm gold", target: "_blank", rel: "noopener", href: "https://wa.me/" + ph + "?text=" + encodeURIComponent(msg), text: t("sendCust") }), el("button", { class: "btn sm ghost", type: "button", text: t("copy"), onclick: () => copy(msg) }))));
+      listT();
+    } catch (e) { toast(e.code === "permission-denied" ? t("trialUsed") : t("err"), "bad"); } finally { btn.disabled = false; } } },
+    el("label", { class: "f" }, el("span", { text: t("custName") }), name), el("label", { class: "f" }, el("span", { text: t("custPhone") }), phone), el("button", { class: "btn gold", text: t("createTrial") }));
+  const listBox = el("div", { class: "lst" });
+  async function listT() { try { const tr = (await getAll("trials")).sort((a, b) => ms(b.at) - ms(a.at)).slice(0, 40);
+    listBox.replaceChildren(...(tr.length ? tr.map(x => el("div", { class: "line card", style: "padding:12px" }, el("div", {}, el("b", { text: x.name }), el("div", { class: "small muted", style: "direction:ltr;text-align:start", text: "+" + x.id }),
+      el("div", { class: "small muted", text: fmtDate(x.at) + (x.byName ? ` · ${t("by")} ${x.byName}` : "") })), el("span", { class: "chip " + (ms(x.expiresAt) > Date.now() ? "ok" : ""), text: ms(x.expiresAt) > Date.now() ? t("live") : t("expired") })))
+      : [el("p", { class: "muted", text: t("none") })])); } catch (e) { listBox.replaceChildren(); } }
+  p.replaceChildren(sec(t("trialH"), el("p", { class: "muted small", style: "margin:0", text: t("trialP") }), form, out), sec(t("recentTrials"), listBox)); listT();
+}
+async function createTrial(name, phone) {
+  const gid = "t" + randomId(9), pin = randomPin(), key = await vaultKey(gid, pin), now = fs.Timestamp.now(), exp = fs.Timestamp.fromMillis(Date.now() + 3600e3);
+  await fs.setDoc(fs.doc(db, "trials", phone), { name, by: user.uid, byName: user.displayName || user.email || "", gid, at: fs.serverTimestamp(), expiresAt: exp });
+  await fs.setDoc(fs.doc(db, "vaults", key), { owner: user.uid, gid, status: "trial", demo: true, title: lang === "ar" ? "معرض ذكرياتنا" : "Our Memories Museum", recipient: name, sender: "هدايا أمير",
+    dedication: "", company: { name: "", logo: "" }, template: "classic", music: "", visitors: 4, sideRoom: false, openAt: now, expiresAt: exp, photoCount: 0, createdAt: fs.serverTimestamp() });
+  await fs.setDoc(fs.doc(db, "teasers", gid), { status: "trial", title: lang === "ar" ? "معرض ذكرياتنا" : "Our Memories Museum", recipient: name, sender: "هدايا أمير", openAt: now, expiresAt: exp, logo: "", owner: user.uid });
+  return { gid, pin };
+}
+
+/* ---------- pricing ---------- */
+async function pricingTab(p) {
+  const pr = JSON.parse(JSON.stringify(await loadPricing())); const curs = Object.keys(CURRENCIES);
+  const num = (obj, k, label) => { const i = el("input", { class: "in", type: "number", min: "0", step: "any", value: obj[k] ?? 0, dir: "ltr" }); i.oninput = () => obj[k] = Number(i.value || 0); return el("label", { class: "f" }, el("span", { text: label }), i); };
+  const txt = (obj, k, label, dir) => { const i = el("input", { class: "in", value: obj[k] || "", dir: dir || "auto" }); i.oninput = () => obj[k] = i.value; return el("label", { class: "f" }, el("span", { text: label }), i); };
+  const pkBox = el("div", { class: "stack" });
+  function drawPk() { pkBox.replaceChildren(...pr.packages.map((pk, i) => { pk.prices = pk.prices || {};
+    const biz = el("input", { type: "checkbox" }); biz.checked = !!pk.business; biz.onchange = () => pk.business = biz.checked;
+    return el("div", { class: "pkg" }, el("div", { class: "row2" }, txt(pk, "nameAr", t("nameAr")), txt(pk, "nameEn", t("nameEn"), "ltr")), el("div", { class: "row2" }, num(pk, "visitors", t("visitors")), num(pk, "months", t("months"))),
+      el("div", { class: "grid3" }, ...curs.map(c => num(pk.prices, c, CURRENCIES[c][lang]))),
+      el("div", { class: "line" }, el("label", { style: "display:flex;gap:8px;align-items:center" }, biz, t("biz")), el("button", { class: "btn sm danger", type: "button", text: t("removePkg"), onclick: () => { pr.packages.splice(i, 1); drawPk(); } }))); })); }
+  drawPk(); pr.sideRoom = pr.sideRoom || {}; pr.bank = pr.bank || {};
+  p.replaceChildren(sec(t("pkgs"), pkBox, el("button", { class: "btn ghost", text: t("addPkg"), onclick: () => { pr.packages.push({ id: "p" + randomId(5), nameAr: "", nameEn: "", visitors: 4, months: 12, business: false, prices: { USD: 0, SAR: 0, SDG: 0 } }); drawPk(); } })),
+    sec(t("side"), el("div", { class: "grid3" }, ...curs.map(c => num(pr.sideRoom, c, CURRENCIES[c][lang])))),
+    sec(t("bank"), txt(pr.bank, "name", t("bankName")), txt(pr.bank, "holder", t("holder")), txt(pr.bank, "account", t("account"), "ltr"), txt(pr.bank, "note", t("note"))),
+    el("button", { class: "btn gold block", text: t("save"), onclick: async () => { try { await fs.setDoc(fs.doc(db, "settings", "pricing"), { packages: pr.packages, sideRoom: pr.sideRoom, bank: pr.bank, updatedAt: fs.serverTimestamp() }); toast(t("savedOk")); } catch (e) { toast(t("noPerm"), "bad"); } } }));
+}
+
+/* ---------- discount codes ---------- */
+async function codes(p) {
+  const list = (await getAll("discounts")).sort((a, b) => ms(b.createdAt) - ms(a.createdAt));
+  const f = { code: el("input", { class: "in", dir: "ltr", maxlength: "20", style: "text-transform:uppercase" }), type: el("select", { class: "in" }, el("option", { value: "percent", text: t("percent") }), el("option", { value: "amount", text: t("amount") })),
+    value: el("input", { class: "in", type: "number", min: "0", step: "any", dir: "ltr" }), currency: el("select", { class: "in" }, ...Object.keys(CURRENCIES).map(c => el("option", { value: c, text: CURRENCIES[c][lang] }))),
+    max: el("input", { class: "in", type: "number", min: "1", dir: "ltr" }), exp: el("input", { class: "in", type: "date" }) };
+  const curWrap = el("label", { class: "f hidden" }, el("span", { text: t("currency") }), f.currency); f.type.onchange = () => curWrap.classList.toggle("hidden", f.type.value !== "amount");
+  const form = el("form", { class: "stack", style: "gap:0", novalidate: true, onsubmit: async ev => { ev.preventDefault(); const code = f.code.value.trim().toUpperCase();
+    if (!/^[A-Z0-9]{3,20}$/.test(code)) return toast(t("badCodeName"), "bad"); const v = Number(f.value.value); if (!(v > 0)) return toast(t("value"), "bad");
+    try { if ((await fs.getDoc(fs.doc(db, "discounts", code))).exists()) return toast(t("exists"), "bad");
+      await fs.setDoc(fs.doc(db, "discounts", code), { type: f.type.value, value: v, currency: f.type.value === "amount" ? f.currency.value : "", maxUses: Number(f.max.value) || 0, used: 0, active: true,
+        expiresAt: f.exp.value ? fs.Timestamp.fromDate(new Date(f.exp.value + "T23:59:59")) : null, createdAt: fs.serverTimestamp() }); toast(t("savedOk")); codes(p); } catch (e) { toast(t("noPerm"), "bad"); } } },
+    el("div", { class: "row2" }, el("label", { class: "f" }, el("span", { text: t("codeL") }), f.code), el("label", { class: "f" }, el("span", { text: t("type") }), f.type)),
+    el("div", { class: "row2" }, el("label", { class: "f" }, el("span", { text: t("value") }), f.value), curWrap), el("div", { class: "row2" }, el("label", { class: "f" }, el("span", { text: t("maxUses") }), f.max), el("label", { class: "f" }, el("span", { text: t("expires") }), f.exp)),
+    el("button", { class: "btn gold", text: t("create") }));
+  const rows = list.map(d => el("div", { class: "card line", style: "padding:12px" }, el("div", {}, el("b", { style: "direction:ltr;display:inline-block", text: d.id }),
+      el("div", { class: "small muted", text: (d.type === "percent" ? fmtNum(d.value, lang) + "%" : money(d.value, d.currency, lang)) + ` · ${t("used")} ${fmtNum(d.used || 0, lang)}${d.maxUses ? " / " + fmtNum(d.maxUses, lang) : ""}` + (d.expiresAt ? ` · ${fmtDate(d.expiresAt, false)}` : "") })),
+    el("div", { class: "acts" }, el("button", { class: "btn sm ghost", text: d.active === false ? t("enable") : t("disable"), onclick: async () => { await fs.updateDoc(fs.doc(db, "discounts", d.id), { active: d.active === false }); codes(p); } }),
+      el("button", { class: "btn sm danger", text: t("del"), onclick: async () => { if (!confirm(t("delQ"))) return; await fs.deleteDoc(fs.doc(db, "discounts", d.id)); codes(p); } }))));
+  p.replaceChildren(sec(t("newCode"), form), el("div", { class: "lst" }, ...(rows.length ? rows : [el("p", { class: "muted", text: t("none") })])));
+}
+
+/* ---------- feedback ---------- */
+let onlyC = false;
+async function feedback(p) {
+  const list = (await getAll("feedback")).sort((a, b) => ms(b.at) - ms(a.at)).filter(f => !onlyC || f.type === "complaint");
+  const tog = el("label", { style: "display:flex;gap:8px;align-items:center;margin-bottom:12px" }, el("input", { type: "checkbox", checked: onlyC, onchange: e => { onlyC = e.target.checked; feedback(p); } }), t("onlyComplaints"));
+  const chip = { complaint: "bad", suggestion: "gold", feedback: "" };
+  p.replaceChildren(tog, el("div", { class: "lst" }, ...(list.length ? list.map(f => el("div", { class: "card stack", style: "gap:8px" },
+    el("div", { class: "line" }, el("span", { class: "chip " + (chip[f.type] || ""), text: t("fb")[f.type] || f.type }), f.resolved ? el("span", { class: "chip ok", text: t("resolved") }) : null),
+    el("p", { style: "margin:0;white-space:pre-wrap", text: f.text }), el("div", { class: "small muted", text: (f.name || t("anon")) + " · " + fmtDate(f.at) }),
+    el("div", { class: "acts" }, el("button", { class: "btn sm ghost", text: f.resolved ? t("reopen") : t("resolve"), onclick: async () => { await fs.updateDoc(fs.doc(db, "feedback", f.id), { resolved: !f.resolved }); feedback(p); } }),
+      el("button", { class: "btn sm danger", text: t("del"), onclick: async () => { if (!confirm(t("delQ"))) return; await fs.deleteDoc(fs.doc(db, "feedback", f.id)); feedback(p); } }))))
+    : [el("p", { class: "muted", text: t("none") })])));
+}
+
+/* ---------- team ---------- */
+async function team(p) {
+  const [members, reqs] = await Promise.all([getAll("roles"), getAll("staffRequests")]);
+  const roles = ["admin", "staff", "marketer"];
+  const mRows = members.map(m => { const sel = el("select", { class: "in", style: "width:auto;min-height:38px", disabled: m.id === user.uid }, ...roles.map(r => el("option", { value: r, text: t("role")[r], selected: m.role === r })));
+    sel.onchange = async () => { await fs.updateDoc(fs.doc(db, "roles", m.id), { role: sel.value }); toast(t("savedOk")); };
+    return el("div", { class: "card line", style: "padding:12px" }, el("div", {}, el("b", { text: (m.name || m.email || m.id) + (m.id === user.uid ? " " + t("you") : "") }), el("div", { class: "small muted", text: m.email || "" })),
+      el("div", { class: "acts" }, sel, m.id !== user.uid ? el("button", { class: "btn sm danger", text: t("remove"), onclick: async () => { if (!confirm(t("delQ"))) return; await fs.deleteDoc(fs.doc(db, "roles", m.id)); team(p); } }) : null)); });
+  const rRows = reqs.map(r => el("div", { class: "card stack", style: "padding:12px;gap:8px" }, el("div", {}, el("b", { text: r.name || r.email }), el("div", { class: "small muted", text: r.email || "" })),
+    el("div", { class: "acts" }, ...["staff", "marketer", "admin"].map(ro => el("button", { class: "btn sm " + (ro === "admin" ? "ghost" : "gold"), text: `${t("approveAs")} ${t("role")[ro]}`, onclick: async () => {
+      const b = fs.writeBatch(db); b.set(fs.doc(db, "roles", r.id), { role: ro, name: r.name || "", email: r.email || "", at: fs.serverTimestamp() }); b.delete(fs.doc(db, "staffRequests", r.id)); await b.commit(); team(p); } })),
+      el("button", { class: "btn sm danger", text: t("reject"), onclick: async () => { await fs.deleteDoc(fs.doc(db, "staffRequests", r.id)); team(p); } }))));
+  p.replaceChildren(sec(t("requests"), ...(rRows.length ? rRows : [el("p", { class: "muted", style: "margin:0", text: t("none") })])), sec(t("members"), ...mRows));
+}
+
+applyLang();
+</script>
+</body>
+</html>

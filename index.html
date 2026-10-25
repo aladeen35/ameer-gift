@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>هدايا أمير — Ameer Gift</title>
+<meta name="description" content="متحف ذكريات ثلاثي الأبعاد تهديه لمن تحب">
+<link rel="icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#13294B">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Reem+Kufi:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.hero{padding:34px 0 10px;text-align:center}
+.hero img{width:min(230px,60vw);height:auto;background:#fff;border-radius:24px;padding:10px 14px}
+.hero h1{font-size:clamp(26px,7vw,38px);margin:18px 0 8px}
+.hero p{color:var(--muted);margin:0 auto;max-width:520px}
+.feats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0}
+.feats div{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 8px;text-align:center;font-size:13.5px;color:var(--muted)}
+.feats b{display:block;font-family:var(--font-display);font-size:20px;color:var(--gold);font-weight:600}
+.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;margin:16px 0}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.gbtn{background:var(--surface);color:var(--ink);border:1.5px solid var(--line)}
+.gbtn svg{width:20px;height:20px}
+.linkbtn{background:none;border:0;color:var(--gold);font-size:14px;padding:6px 0;text-decoration:underline;text-underline-offset:3px}
+.gcard{display:grid;gap:10px}
+.gcard .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.gcard h3{font-size:19px}
+.access{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:var(--gold-soft);border-radius:14px;padding:12px}
+.access code{font-size:13px;word-break:break-all;direction:ltr;text-align:start}
+.pin{font-family:var(--font-display);font-size:28px;letter-spacing:.3em;direction:ltr;color:var(--ink);font-weight:600}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.wnav{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 30%);padding:18px 0 calc(14px + env(safe-area-inset-bottom,0px));display:flex;gap:10px}
+.wnav .btn{flex:1}
+.bank{background:var(--surface-2);border-radius:14px;padding:14px}
+.bank .acc{font-family:var(--font-display);font-size:22px;direction:ltr;text-align:start;font-weight:600}
+.total{display:flex;justify-content:space-between;align-items:baseline;font-size:18px;font-weight:600}
+.total span:last-child{font-family:var(--font-display);font-size:26px;color:var(--gold)}
+.logoprev{max-height:90px;max-width:100%;background:repeating-conic-gradient(#eee 0 25%,#fff 0 50%) 0/16px 16px;border-radius:10px;padding:6px}
+.count{font-size:14px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <span class="logo-chip"><img class="logo" src="logo-full.png" alt="هدايا أمير — Ameer Gift"></span>
+  <span class="grow"></span>
+  <button class="iconbtn hidden" id="instBtn"></button>
+  <button class="iconbtn" id="langBtn">EN</button>
+  <button class="iconbtn hidden" id="outBtn"></button>
+</div></header>
+
+<main class="wrap">
+  <div id="boot" style="padding:60px 0;text-align:center"><span class="spinner"></span></div>
+
+  <!-- signed out -->
+  <section id="vLanding" class="hidden">
+    <div class="hero">
+      <img src="logo-full.png" alt="">
+      <h1 data-t="heroT"></h1><p data-t="heroP"></p>
+    </div>
+    <div class="feats"><div><b data-t="f1n"></b><span data-t="f1"></span></div><div><b data-t="f2n"></b><span data-t="f2"></span></div><div><b>⏳</b><span data-t="f3"></span></div></div>
+    <div class="card">
+      <h2 style="font-size:21px;margin-bottom:14px" id="authTitle"></h2>
+      <button class="btn gbtn block" id="gBtn"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span data-t="google"></span></button>
+      <div class="or"><span data-t="or"></span></div>
+      <form id="eForm" novalidate>
+        <label class="f hidden" id="nameF"><span data-t="fullName"></span><input class="in" id="eName" autocomplete="name"></label>
+        <label class="f"><span data-t="email"></span><input class="in" id="eMail" type="email" autocomplete="email" dir="ltr" required></label>
+        <label class="f"><span data-t="password"></span><input class="in" id="ePass" type="password" autocomplete="current-password" dir="ltr" required minlength="6"></label>
+        <button class="btn block" id="eBtn" type="submit"></button>
+      </form>
+      <div style="display:flex;justify-content:space-between;gap:10px;margin-top:8px"><button class="linkbtn" id="modeBtn"></button><button class="linkbtn" id="resetBtn" data-t="forgot"></button></div>
+    </div>
+  </section>
+
+  <!-- signed in: my museums -->
+  <section id="vHome" class="hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin:22px 0 14px">
+      <div><p class="muted small" style="margin:0" id="hello"></p><h1 style="font-size:24px" data-t="myMuseums"></h1></div>
+      <button class="btn gold" id="newBtn" data-t="newMuseum"></button>
+    </div>
+    <div class="stack" id="gList"></div>
+  </section>
+
+  <!-- wizard -->
+  <section id="vWizard" class="hidden">
+    <div class="steps" id="steps"></div>
+    <p class="steplbl" id="stepLbl"></p>
+
+    <div class="wstep" data-step="0">
+      <h2 data-t="s0h" style="margin-bottom:14px"></h2>
+      <div class="seg" id="typeSeg" style="margin-bottom:14px"><button data-v="individual" data-t="individual"></button><button data-v="company" data-t="company"></button></div>
+      <div class="seg" id="curSeg" style="margin-bottom:14px"><button data-v="USD"></button><button data-v="SAR"></button><button data-v="SDG"></button></div>
+      <div class="tiles" id="pkgTiles"></div>
+      <button class="tile" id="sideTile" style="margin-top:10px" aria-pressed="false"><b data-t="sideRoom"></b><span class="muted small" data-t="sideRoomD"></span><span class="price" id="sidePrice"></span></button>
+    </div>
+
+    <div class="wstep" data-step="1">
+      <h2 data-t="s1h" style="margin-bottom:14px"></h2>
+      <label class="f"><span data-t="mTitle"></span><input class="in" id="wTitle" maxlength="40"></label>
+      <div class="row2">
+        <label class="f"><span><span data-t="recipient"></span> <b>*</b></span><input class="in" id="wTo" maxlength="30"></label>
+        <label class="f"><span><span data-t="sender"></span> <b>*</b></span><input class="in" id="wFrom" maxlength="30"></label>
+      </div>
+      <label class="f"><span data-t="dedText"></span><textarea class="in" id="wDed" maxlength="300"></textarea></label>
+      <p class="hint" data-t="dedHint"></p>
+      <div id="bizBox" class="card hidden" style="margin-top:6px">
+        <label class="f"><span data-t="coName"></span><input class="in" id="wCo" maxlength="40"></label>
+        <label class="btn ghost sm" style="position:relative"><span data-t="coLogo"></span><input type="file" id="wLogo" accept="image/*" style="position:absolute;opacity:0;width:1px;height:1px"></label>
+        <p class="hint" style="margin-top:8px" data-t="coLogoHint"></p>
+        <img id="logoPrev" class="logoprev hidden" alt="">
+      </div>
+    </div>
+
+    <div class="wstep" data-step="2">
+      <h2 data-t="s2h" style="margin-bottom:6px"></h2>
+      <p class="hint" style="margin:0 0 14px" data-t="s2p"></p>
+      <label class="drop" id="drop"><input type="file" id="wFiles" accept="image/*" multiple><b data-t="addPhotos"></b><span class="count" id="phCount"></span></label>
+      <div class="photos" id="phList" style="margin-top:14px"></div>
+    </div>
+
+    <div class="wstep" data-step="3">
+      <h2 data-t="s3h" style="margin-bottom:14px"></h2>
+      <div class="tiles" id="tplTiles"></div>
+      <div class="divider"></div>
+      <label class="f"><span data-t="music"></span><input class="in" id="wMusic" dir="ltr" placeholder="https://youtu.be/..."></label>
+      <p class="hint" data-t="musicHint"></p>
+    </div>
+
+    <div class="wstep" data-step="4">
+      <h2 data-t="s4h" style="margin-bottom:14px"></h2>
+      <label class="f"><span><span data-t="openAt"></span> <b>*</b></span><input class="in" id="wOpen" type="datetime-local"></label>
+      <p class="hint" data-t="openHint"></p>
+      <button class="btn ghost sm" id="openNow" data-t="openNow"></button>
+    </div>
+
+    <div class="wstep" data-step="5">
+      <h2 data-t="s5h" style="margin-bottom:14px"></h2>
+      <div class="card stack">
+        <dl class="kv" id="sumKv"></dl>
+        <div class="divider" style="margin:4px 0"></div>
+        <div style="display:flex;gap:8px"><input class="in" id="wCode" placeholder="" dir="ltr" style="text-transform:uppercase"><button class="btn ghost" id="codeBtn" data-t="apply"></button></div>
+        <p class="small muted" id="codeMsg" style="margin:0"></p>
+        <div class="total"><span data-t="total"></span><span id="totalV"></span></div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <label class="f"><span><span data-t="phone"></span> <b>*</b></span><input class="in" id="wPhone" type="tel" dir="ltr" inputmode="tel" autocomplete="tel" placeholder="+249 / +966"></label>
+        <div class="bank stack" id="bankBox"></div>
+        <label class="btn ghost block" style="position:relative;margin-top:14px"><span data-t="receipt"></span><input type="file" id="wReceipt" accept="image/*" style="position:absolute;opacity:0;width:1px;height:1px"></label>
+        <img id="rcPrev" class="hidden" style="max-width:160px;border-radius:10px;margin-top:10px" alt="">
+      </div>
+    </div>
+
+    <div class="wnav"><button class="btn ghost" id="backBtn" data-t="back"></button><button class="btn" id="nextBtn"></button></div>
+  </section>
+</main>
+
+<footer class="site"><div class="wrap">
+  <h2 style="font-size:19px;margin-bottom:4px" data-t="fbH"></h2>
+  <p class="muted small" style="margin:0 0 14px" data-t="fbP"></p>
+  <form id="fbForm" class="stack" novalidate style="gap:10px">
+    <div class="seg" id="fbType"><button type="button" data-v="feedback" aria-pressed="true" data-t="fbOpinion"></button><button type="button" data-v="suggestion" data-t="fbSuggest"></button><button type="button" data-v="complaint" data-t="fbComplaint"></button></div>
+    <input class="in" id="fbName" maxlength="40">
+    <textarea class="in" id="fbText" maxlength="1000"></textarea>
+    <button class="btn" data-t="send"></button>
+  </form>
+  <p class="muted small" style="margin-top:22px;text-align:center">© هدايا أمير · Ameer Gift</p>
+</div></footer>
+
+<dialog id="dlg"><div class="dbody" id="dlgBody"></div></dialog>
+
+<script type="module">
+import { auth, db, fs, au, googleSignIn, $, $$, el, toast, normalizePhone, phoneOk, latinDigits, fmtNum, CURRENCIES, money, randomId,
+  compressImage, compressLogo, promptInstall, loadPricing, priceOf, applyDiscount, discountValid, museumUrl, waShare, authError } from "./shared.js";
+
+/* ---------- language ---------- */
+let lang = localStorage.getItem("ag-lang") || (/^ar/i.test(navigator.language) ? "ar" : "en");
+const T = {
+ ar:{install:"تثبيت التطبيق",heroT:"متحف ذكريات ثلاثي الأبعاد تهديه لمن تحب",f1n:"٣D",f2n:"٢٨",heroP:"ارفع صوركم، اختر الديكور والموسيقى وموعد الفتح، ونجهّز لك معرضًا يتجول فيه أحبابك معًا.",f1:"معرض تتجول فيه",f2:"صورة كحد أقصى",f3:"عدّ تنازلي للمفاجأة",
+  signin:"تسجيل الدخول",signup:"إنشاء حساب",google:"المتابعة بحساب Google",or:"أو بالبريد الإلكتروني",fullName:"الاسم",email:"البريد الإلكتروني",password:"كلمة المرور",forgot:"نسيت كلمة المرور؟",toSignup:"ليس لديك حساب؟ أنشئ حسابًا",toSignin:"لديك حساب؟ سجّل الدخول",
+  resetSent:"أرسلنا رابط إعادة التعيين إلى بريدك",needEmail:"اكتب بريدك أولًا",out:"خروج",hello:n=>`أهلًا ${n}`,myMuseums:"معارضي",newMuseum:"معرض جديد",empty:"لا توجد معارض بعد. ابدأ بإنشاء أول معرض.",
+  st:{draft:"مسودة",pending:"بانتظار التحقق من التحويل",active:"مفعّل",rejected:"مرفوض"},cont:"متابعة",del:"حذف",delQ:"حذف هذه المسودة نهائيًا؟",edit:"تعديل وإعادة الإرسال",open:"فتح المعرض",copy:"نسخ",copied:"تم النسخ",share:"إرسال واتساب",pinL:"رمز الدخول",linkL:"رابط المعرض",opensL:"يفتح",reason:"السبب",pendingNote:"سنراجع التحويل ونرسل لك رابط المعرض ورمز الدخول هنا.",
+  steps:["الباقة","الإهداء","الصور","الديكور والموسيقى","موعد الفتح","الدفع"],stepOf:(a,b)=>`الخطوة ${a} من ${b}`,
+  s0h:"اختر الباقة",individual:"أفراد",company:"شركات",visitors:n=>`حتى ${n} زوار معًا`,months:n=>`يبقى المعرض ${n} شهرًا`,sideRoom:"غرفة جانبية",sideRoomD:"تضاعف عدد الصور من ١٤ إلى ٢٨",
+  s1h:"بطاقة الإهداء",mTitle:"عنوان المعرض",recipient:"إلى",sender:"من",dedText:"نص الإهداء",dedHint:"هذا النص يظهر على بطاقة المدخل، وتستطيع تعديله لاحقًا.",coName:"اسم الشركة",coLogo:"رفع شعار الشركة",coLogoHint:"PNG بخلفية شفافة أفضل. يظهر الشعار مكان شعار هدايا أمير.",
+  s2h:"صور الذكريات",s2p:"ارفع كل الصور مرة واحدة، واكتب تاريخ كل صورة. ستترتب في المعرض من الأقدم إلى الأحدث.",addPhotos:"اختر الصور",of:(a,b)=>`${a} من ${b}`,date:"التاريخ",title:"العنوان",caption:"التعليق",ai:"اقتراح تعليق بالذكاء الاصطناعي (قريبًا)",remove:"إزالة",tooMany:n=>`الحد الأقصى ${n} صورة في هذه الباقة`,
+  s3h:"شكل المعرض",tpl:{classic:["الكلاسيكي الذهبي","جدران كحلية، نجف ذهبي، وإضاءة دافئة"],garden:["الحديقة","قريبًا"],wedding:["الزفاف","قريبًا"],grad:["التخرج","قريبًا"]},music:"رابط الموسيقى من يوتيوب (اختياري)",musicHint:"رفع ملف أغنية من جوالك سيتوفر قريبًا. تأكد أن لك حق استخدام الموسيقى.",badYt:"الرابط ليس من يوتيوب",
+  s4h:"متى يُفتح المعرض؟",openAt:"تاريخ ووقت الفتح",openHint:"قبل هذا الموعد يرى الزوار صفحة انتظار بعدّ تنازلي، ثم يُفتح المعرض تلقائيًا.",openNow:"افتحه فور التفعيل",
+  s5h:"المراجعة والدفع",pkg:"الباقة",photos:"الصور",rooms:"القاعات",opens:"الفتح",immediately:"فور التفعيل",price:"السعر",discount:"الخصم",apply:"تطبيق",codePh:"كود الخصم",badCode:"الكود غير صالح أو منتهي",codeOk:v=>`تم تطبيق خصم ${v}`,total:"الإجمالي",
+  phone:"رقم جوالك (واتساب)",bankH:"حوّل المبلغ إلى الحساب التالي، ثم ارفع صورة الإشعار",bankName:"البنك",accName:"اسم صاحب الحساب",accNo:"رقم الحساب",receipt:"رفع صورة إشعار التحويل",receiptOk:"تم إرفاق الإشعار ✓",
+  back:"رجوع",next:"التالي",submit:"إرسال الطلب",saving:"جارٍ الحفظ…",saved:"تم الحفظ",submitted:"تم إرسال طلبك. سنراجع التحويل قريبًا.",
+  req:{to:"اكتب اسم المُهدى إليه",from:"اكتب اسمك",photos:"أضف صورة واحدة على الأقل",dates:"اكتب تاريخ كل صورة",open:"اختر موعد الفتح",phone:"اكتب رقم جوالك مع رمز الدولة، مثل 966 أو 249",receipt:"ارفع صورة إشعار التحويل",pkg:"اختر باقة"},
+  fbH:"رأيك يهمنا",fbP:"اكتب رأيك أو اقتراحك أو شكواك، وتصل مباشرة لفريق هدايا أمير.",fbOpinion:"رأي",fbSuggest:"اقتراح",fbComplaint:"شكوى",fbName:"اسمك (اختياري)",fbText:"اكتب هنا",send:"إرسال",fbThanks:"شكرًا، وصلتنا رسالتك",fbEmpty:"اكتب رسالتك أولًا",
+  defTitle:"معرض ذكرياتنا",permission:"لا تملك صلاحية لهذه العملية",loadErr:"تعذّر تحميل البيانات"},
+ en:{install:"Install app",heroT:"A 3D memories museum, gifted to someone you love",f1n:"3D",f2n:"28",heroP:"Upload your photos, pick the decor, music and opening time, and we prepare a museum your loved ones walk through together.",f1:"A museum to walk",f2:"photos at most",f3:"A countdown surprise",
+  signin:"Sign in",signup:"Create account",google:"Continue with Google",or:"or with email",fullName:"Name",email:"Email",password:"Password",forgot:"Forgot password?",toSignup:"No account? Create one",toSignin:"Have an account? Sign in",
+  resetSent:"We sent a reset link to your email",needEmail:"Enter your email first",out:"Sign out",hello:n=>`Hello ${n}`,myMuseums:"My museums",newMuseum:"New museum",empty:"No museums yet. Create your first one.",
+  st:{draft:"Draft",pending:"Awaiting payment check",active:"Active",rejected:"Rejected"},cont:"Continue",del:"Delete",delQ:"Delete this draft for good?",edit:"Edit and resubmit",open:"Open museum",copy:"Copy",copied:"Copied",share:"Send on WhatsApp",pinL:"Access code",linkL:"Museum link",opensL:"Opens",reason:"Reason",pendingNote:"We will check the transfer and send the museum link and access code here.",
+  steps:["Package","Dedication","Photos","Decor & music","Opening","Payment"],stepOf:(a,b)=>`Step ${a} of ${b}`,
+  s0h:"Choose a package",individual:"Individuals",company:"Companies",visitors:n=>`Up to ${n} visitors together`,months:n=>`Stays open ${n} months`,sideRoom:"Side room",sideRoomD:"Doubles photos from 14 to 28",
+  s1h:"Dedication card",mTitle:"Museum title",recipient:"To",sender:"From",dedText:"Dedication text",dedHint:"This text appears on the entrance card, and you can edit it later.",coName:"Company name",coLogo:"Upload company logo",coLogoHint:"A transparent PNG works best. It replaces the Ameer Gift logo.",
+  s2h:"Memory photos",s2p:"Upload all photos at once and set each photo's date. They are arranged from oldest to newest.",addPhotos:"Choose photos",of:(a,b)=>`${a} of ${b}`,date:"Date",title:"Title",caption:"Caption",ai:"Suggest a caption with AI (soon)",remove:"Remove",tooMany:n=>`This package allows ${n} photos`,
+  s3h:"Museum style",tpl:{classic:["Classic Gold","Navy walls, gold chandeliers, warm light"],garden:["Garden","Soon"],wedding:["Wedding","Soon"],grad:["Graduation","Soon"]},music:"Music link from YouTube (optional)",musicHint:"Uploading a song file from your phone is coming soon. Make sure you have the right to use the music.",badYt:"This is not a YouTube link",
+  s4h:"When does the museum open?",openAt:"Opening date and time",openHint:"Before this time visitors see a waiting page with a countdown, then the museum opens by itself.",openNow:"Open as soon as it is activated",
+  s5h:"Review and pay",pkg:"Package",photos:"Photos",rooms:"Halls",opens:"Opens",immediately:"On activation",price:"Price",discount:"Discount",apply:"Apply",codePh:"Discount code",badCode:"Invalid or expired code",codeOk:v=>`Discount applied: ${v}`,total:"Total",
+  phone:"Your mobile (WhatsApp)",bankH:"Transfer the amount to this account, then upload the receipt",bankName:"Bank",accName:"Account holder",accNo:"Account number",receipt:"Upload transfer receipt",receiptOk:"Receipt attached ✓",
+  back:"Back",next:"Next",submit:"Send order",saving:"Saving…",saved:"Saved",submitted:"Your order was sent. We will check the transfer soon.",
+  req:{to:"Enter the recipient's name",from:"Enter your name",photos:"Add at least one photo",dates:"Set a date for every photo",open:"Choose the opening time",phone:"Enter your mobile with the country code, like 966 or 249",receipt:"Upload the transfer receipt",pkg:"Choose a package"},
+  fbH:"We value your opinion",fbP:"Share an opinion, suggestion or complaint. It goes straight to the Ameer Gift team.",fbOpinion:"Opinion",fbSuggest:"Suggestion",fbComplaint:"Complaint",fbName:"Your name (optional)",fbText:"Write here",send:"Send",fbThanks:"Thank you, we received your message",fbEmpty:"Write your message first",
+  defTitle:"Our Memories Museum",permission:"You don't have permission for this",loadErr:"Could not load data"}};
+const t = k => T[lang][k];
+function applyLang() {
+  document.documentElement.lang = lang; document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+  $$("[data-t]").forEach(e => { const v = t(e.dataset.t); if (typeof v === "string") e.textContent = v; });
+  $("#langBtn").textContent = lang === "ar" ? "EN" : "عربي"; $("#langBtn").setAttribute("aria-label", lang === "ar" ? "English" : "العربية");
+  $("#outBtn").textContent = t("out"); $("#instBtn").textContent = t("install"); $("#fbName").placeholder = t("fbName"); $("#fbText").placeholder = t("fbText"); $("#wCode").placeholder = t("codePh");
+  $$("#curSeg button").forEach(b => b.textContent = CURRENCIES[b.dataset.v][lang]);
+  setAuthMode(authMode);
+  if (user) { $("#hello").textContent = T[lang].hello(user.displayName || user.email || ""); renderList(); }
+  if (!$("#vWizard").classList.contains("hidden")) renderStep();
+}
+$("#langBtn").onclick = () => { lang = lang === "ar" ? "en" : "ar"; localStorage.setItem("ag-lang", lang); applyLang(); };
+
+/* ---------- auth ---------- */
+let user = null, authMode = "signin", pricing = null;
+function setAuthMode(m) { authMode = m; $("#authTitle").textContent = t(m); $("#eBtn").textContent = t(m); $("#modeBtn").textContent = t(m === "signin" ? "toSignup" : "toSignin");
+  $("#nameF").classList.toggle("hidden", m !== "signup"); $("#ePass").autocomplete = m === "signup" ? "new-password" : "current-password"; }
+$("#modeBtn").onclick = () => setAuthMode(authMode === "signin" ? "signup" : "signin");
+$("#gBtn").onclick = async () => { try { await googleSignIn(); } catch (e) { toast(authError(e, lang), "bad"); } };
+$("#eForm").onsubmit = async ev => { ev.preventDefault(); const em = $("#eMail").value.trim(), pw = $("#ePass").value; const b = $("#eBtn"); b.disabled = true;
+  try { if (authMode === "signup") { const c = await au.createUserWithEmailAndPassword(auth, em, pw); const n = $("#eName").value.trim(); if (n) await au.updateProfile(c.user, { displayName: n }); }
+        else await au.signInWithEmailAndPassword(auth, em, pw); }
+  catch (e) { toast(authError(e, lang), "bad"); } finally { b.disabled = false; } };
+$("#resetBtn").onclick = async () => { const em = $("#eMail").value.trim(); if (!em) return toast(t("needEmail"), "bad");
+  try { await au.sendPasswordResetEmail(auth, em); toast(t("resetSent")); } catch (e) { toast(authError(e, lang), "bad"); } };
+$("#outBtn").onclick = () => au.signOut(auth);
+
+au.onAuthStateChanged(auth, async u => {
+  user = u; $("#boot").classList.add("hidden"); $("#outBtn").classList.toggle("hidden", !u);
+  if (!u) { show("vLanding"); return; }
+  $("#hello").textContent = T[lang].hello(u.displayName || u.email || "");
+  pricing = pricing || await loadPricing();
+  show("vHome"); renderList();
+});
+function show(id) { ["vLanding", "vHome", "vWizard"].forEach(v => $("#" + v).classList.toggle("hidden", v !== id)); scrollTo(0, 0); }
+
+/* ---------- my museums ---------- */
+let myGalleries = [];
+async function renderList() {
+  const box = $("#gList"); if (!user) return;
+  try { const s = await fs.getDocs(fs.query(fs.collection(db, "galleries"), fs.where("owner", "==", user.uid)));
+        myGalleries = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0)); }
+  catch (e) { box.replaceChildren(el("p", { class: "muted", text: t("loadErr") + " (" + (e.code || "") + ")" })); return; }
+  box.replaceChildren();
+  if (!myGalleries.length) { box.append(el("div", { class: "card muted", text: t("empty") })); return; }
+  for (const g of myGalleries) box.append(await galleryCard(g));
+}
+async function galleryCard(g) {
+  const chipCls = { draft: "", pending: "warn", active: "ok", rejected: "bad" }[g.status] || "";
+  const c = el("div", { class: "card gcard" },
+    el("div", { class: "top" }, el("div", {}, el("h3", { text: g.title || t("defTitle") }), el("p", { class: "muted small", style: "margin:2px 0 0", text: `${t("recipient")}: ${g.recipient || "—"}` })),
+      el("span", { class: "chip " + chipCls, text: t("st")[g.status] || g.status })));
+  const acts = el("div", { class: "acts" });
+  if (g.status === "draft") { acts.append(el("button", { class: "btn sm", text: t("cont"), onclick: () => openWizard(g) }), el("button", { class: "btn sm danger", text: t("del"), onclick: () => delDraft(g) })); }
+  if (g.status === "pending") c.append(el("p", { class: "small muted", style: "margin:0", text: t("pendingNote") }));
+  if (g.status === "rejected") { if (g.rejectReason) c.append(el("p", { class: "small", style: "margin:0;color:var(--bad)", text: `${t("reason")}: ${g.rejectReason}` }));
+    acts.append(el("button", { class: "btn sm", text: t("edit"), onclick: () => openWizard(g) })); }
+  if (g.status === "active") {
+    try { const a = await fs.getDoc(fs.doc(db, "galleries", g.id, "private", "access")); if (a.exists()) {
+      const { pin } = a.data(); const url = museumUrl(g.id);
+      const msg = (lang === "ar" ? `🎁 ${g.title || t("defTitle")}\nرابط المعرض: ${url}\nرمز الدخول: ${pin}` : `🎁 ${g.title || t("defTitle")}\nMuseum link: ${url}\nAccess code: ${pin}`);
+      c.append(el("div", { class: "access" }, el("div", {}, el("div", { class: "small muted", text: t("linkL") }), el("code", { text: url })), el("button", { class: "btn sm ghost", text: t("copy"), onclick: () => copy(url) })),
+        el("div", { class: "access" }, el("div", {}, el("div", { class: "small muted", text: t("pinL") }), el("div", { class: "pin", text: pin })), el("button", { class: "btn sm ghost", text: t("copy"), onclick: () => copy(pin) })));
+      acts.append(el("a", { class: "btn sm gold", href: waShare(msg), target: "_blank", rel: "noopener", text: t("share") }), el("a", { class: "btn sm ghost", href: url, target: "_blank", rel: "noopener", text: t("open") }));
+    } } catch (e) {}
+  }
+  if (g.openAt?.toDate) c.append(el("p", { class: "small muted", style: "margin:0", text: `${t("opensL")}: ${fmtDate(g.openAt.toDate())}` }));
+  if (acts.childNodes.length) c.append(acts);
+  return c;
+}
+function fmtDate(d) { return new Intl.DateTimeFormat(lang === "ar" ? "ar-EG" : "en-GB", { dateStyle: "full", timeStyle: "short" }).format(d); }
+async function copy(s) { try { await navigator.clipboard.writeText(s); toast(t("copied")); } catch (e) { prompt("", s); } }
+async function delDraft(g) { if (!confirm(t("delQ"))) return;
+  try { const ps = await fs.getDocs(fs.collection(db, "galleries", g.id, "photos")); for (const p of ps.docs) await fs.deleteDoc(p.ref); await fs.deleteDoc(fs.doc(db, "galleries", g.id)); renderList(); }
+  catch (e) { toast(t("permission"), "bad"); } }
+$("#newBtn").onclick = () => openWizard(null);
+
+/* ---------- wizard ---------- */
+const N_STEPS = 6; let step = 0, G = null, photos = [], removed = [], discount = null;
+const TPL = ["classic", "garden", "wedding", "grad"];
+function blank() { return { status: "draft", type: "individual", currency: lang === "ar" ? "SAR" : "USD", packageId: "", sideRoom: false, title: "", recipient: "", sender: "", dedication: "", company: { name: "", logo: "" }, template: "classic", music: "", openAt: null, contact: { phone: "" }, discountCode: "", receipt: "" }; }
+async function openWizard(g) {
+  G = Object.assign(blank(), g ? JSON.parse(JSON.stringify({ ...g, openAt: null, createdAt: null })) : {}); G.id = g?.id || null; G.openAtMs = g?.openAt?.toMillis?.() || null;
+  photos = []; removed = []; discount = null;
+  if (G.id) { try { const s = await fs.getDocs(fs.collection(db, "galleries", G.id, "photos")); photos = s.docs.map(d => ({ id: d.id, ...d.data(), dirty: false })); } catch (e) {} }
+  step = g?.status === "rejected" ? 5 : 0; show("vWizard"); renderStep();
+}
+function maxPhotos() { return G.sideRoom ? 28 : 14; }
+function renderStep() {
+  $("#steps").replaceChildren(...Array.from({ length: N_STEPS }, (_, i) => el("i", { class: i <= step ? "on" : "" })));
+  $("#stepLbl").textContent = T[lang].stepOf(fmtNum(step + 1, lang), fmtNum(N_STEPS, lang)) + " · " + t("steps")[step];
+  $$(".wstep").forEach(s => s.classList.toggle("hidden", +s.dataset.step !== step));
+  $("#backBtn").textContent = t("back"); $("#nextBtn").textContent = step === N_STEPS - 1 ? t("submit") : t("next");
+  [s0, s1, s2, s3, s4, s5][step]();
+}
+function seg(sel, val, on) { $$(sel + " button").forEach(b => { b.setAttribute("aria-pressed", String(b.dataset.v === val)); b.onclick = () => { on(b.dataset.v); }; }); }
+function s0() {
+  seg("#typeSeg", G.type, v => { G.type = v; const pk = pricing.packages.find(p => p.id === G.packageId); if (pk && !!pk.business !== (v === "company")) G.packageId = ""; s0(); });
+  seg("#curSeg", G.currency, v => { G.currency = v; s0(); });
+  const list = pricing.packages.filter(p => !!p.business === (G.type === "company"));
+  if (!G.packageId && list[0]) G.packageId = list[0].id;
+  $("#pkgTiles").replaceChildren(...list.map(p => el("button", { class: "tile", "aria-pressed": String(G.packageId === p.id), onclick: () => { G.packageId = p.id; s0(); } },
+    el("b", { text: lang === "ar" ? p.nameAr : p.nameEn }), el("span", { class: "muted small", text: T[lang].visitors(fmtNum(p.visitors, lang)) + " · " + T[lang].months(fmtNum(p.months || 12, lang)) }),
+    el("span", { class: "price", text: money(p.prices?.[G.currency] || 0, G.currency, lang) }))));
+  $("#sideTile").setAttribute("aria-pressed", String(G.sideRoom)); $("#sideTile").onclick = () => { G.sideRoom = !G.sideRoom; s0(); };
+  $("#sidePrice").textContent = "+ " + money(pricing.sideRoom?.[G.currency] || 0, G.currency, lang);
+}
+function s1() {
+  $("#wTitle").value = G.title || t("defTitle"); $("#wTo").value = G.recipient; $("#wFrom").value = G.sender; $("#wDed").value = G.dedication;
+  $("#bizBox").classList.toggle("hidden", G.type !== "company"); $("#wCo").value = G.company?.name || "";
+  if (G.company?.logo) { $("#logoPrev").src = G.company.logo; $("#logoPrev").classList.remove("hidden"); }
+}
+$("#wLogo").onchange = async e => { const f = e.target.files[0]; if (!f) return; try { G.company = G.company || {}; G.company.logo = await compressLogo(f); $("#logoPrev").src = G.company.logo; $("#logoPrev").classList.remove("hidden"); } catch (x) {} };
+function read1() { G.title = $("#wTitle").value.trim() || t("defTitle"); G.recipient = $("#wTo").value.trim(); G.sender = $("#wFrom").value.trim(); G.dedication = $("#wDed").value.trim(); G.company = { ...(G.company || {}), name: $("#wCo").value.trim() }; }
+function s2() { renderPhotos(); }
+function renderPhotos() {
+  const live = photos.filter(p => !p.gone).sort((a, b) => (a.date || "9999").localeCompare(b.date || "9999"));
+  $("#phCount").textContent = T[lang].of(fmtNum(live.length, lang), fmtNum(maxPhotos(), lang));
+  $("#phList").replaceChildren(...live.map(p => {
+    const d = el("input", { class: "in", type: "date", value: p.date || "", "aria-label": t("date") }); d.onchange = () => { p.date = d.value; p.dirty = true; renderPhotos(); };
+    const ti = el("input", { class: "in", value: p.title || "", placeholder: t("title"), maxlength: "40" }); ti.oninput = () => { p.title = ti.value; p.dirty = true; };
+    const ca = el("input", { class: "in", value: p.caption || "", placeholder: t("caption"), maxlength: "160" }); ca.oninput = () => { p.caption = ca.value; p.dirty = true; };
+    return el("div", { class: "ph" }, el("img", { src: p.img, alt: p.title || "" }),
+      el("div", { class: "fields" }, d, ti, ca, el("div", { class: "tools" },
+        el("button", { class: "btn sm ghost", disabled: true, title: t("ai"), text: "✨" }),
+        el("button", { class: "btn sm danger", text: t("remove"), onclick: () => { p.gone = true; if (p.id) removed.push(p.id); renderPhotos(); } }))));
+  }));
+}
+$("#wFiles").onchange = async e => {
+  const files = [...e.target.files]; e.target.value = ""; const room = maxPhotos() - photos.filter(p => !p.gone).length;
+  if (files.length > room) toast(T[lang].tooMany(fmtNum(maxPhotos(), lang)), "bad");
+  for (const f of files.slice(0, Math.max(0, room))) {
+    try { const r = await compressImage(f); const dt = f.lastModified ? new Date(f.lastModified).toISOString().slice(0, 10) : "";
+      photos.push({ id: null, img: r.data, date: dt, title: "", caption: "", dirty: true }); renderPhotos(); } catch (x) {}
+  }
+};
+function s3() {
+  $("#tplTiles").replaceChildren(...TPL.map(k => { const [n, d] = t("tpl")[k]; const on = k === "classic";
+    return el("button", { class: "tile", "aria-pressed": String(G.template === k), disabled: !on, onclick: () => { G.template = k; s3(); } }, el("b", { text: n }), el("span", { class: "muted small", text: d })); }));
+  $("#wMusic").value = G.music || "";
+}
+function s4() { const ms = G.openAtMs; $("#wOpen").value = ms ? toLocalInput(new Date(ms)) : ""; $("#wOpen").min = toLocalInput(new Date()); }
+function toLocalInput(d) { const z = n => String(n).padStart(2, "0"); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`; }
+$("#openNow").onclick = () => { $("#wOpen").value = toLocalInput(new Date()); };
+function currentTotal() { const base = priceOf(pricing, G); return applyDiscount(base, discount, G.currency); }
+function s5() {
+  const pk = pricing.packages.find(p => p.id === G.packageId) || {}; const base = priceOf(pricing, G); const { total, off } = currentTotal();
+  const kv = [[t("pkg"), (lang === "ar" ? pk.nameAr : pk.nameEn) + " · " + T[lang].visitors(fmtNum(pk.visitors || 0, lang))], [t("rooms"), fmtNum(G.sideRoom ? 2 : 1, lang)],
+    [t("photos"), fmtNum(photos.filter(p => !p.gone).length, lang)], [t("opens"), G.openAtMs ? fmtDate(new Date(G.openAtMs)) : t("immediately")], [t("price"), money(base, G.currency, lang)]];
+  if (off) kv.push([t("discount"), "− " + money(off, G.currency, lang)]);
+  $("#sumKv").replaceChildren(...kv.flatMap(([k, v]) => [el("dt", { text: k }), el("dd", { text: v })]));
+  $("#totalV").textContent = money(total, G.currency, lang); $("#wCode").value = G.discountCode || ""; $("#wPhone").value = G.contact?.phone || "";
+  const b = pricing.bank || {};
+  $("#bankBox").replaceChildren(el("b", { text: t("bankH") }), el("dl", { class: "kv" }, el("dt", { text: t("bankName") }), el("dd", { text: b.name || "بنكك" }),
+    el("dt", { text: t("accName") }), el("dd", { text: b.holder || "—" })), el("div", { class: "small muted", text: t("accNo") }),
+    el("div", { style: "display:flex;gap:8px;align-items:center;justify-content:space-between" }, el("span", { class: "acc", text: b.account || "—" }), b.account ? el("button", { class: "btn sm ghost", text: t("copy"), onclick: () => copy(b.account) }) : null),
+    b.note ? el("p", { class: "small muted", style: "margin:0", text: b.note }) : "");
+  if (G.receipt) { $("#rcPrev").src = G.receipt; $("#rcPrev").classList.remove("hidden"); }
+}
+$("#codeBtn").onclick = async () => { const code = $("#wCode").value.trim().toUpperCase(); G.discountCode = ""; discount = null; $("#codeMsg").textContent = "";
+  if (!code) return s5();
+  try { const d = await fs.getDoc(fs.doc(db, "discounts", code)); if (d.exists() && discountValid(d.data())) { discount = d.data(); G.discountCode = code;
+      $("#codeMsg").textContent = T[lang].codeOk(discount.type === "percent" ? fmtNum(discount.value, lang) + "%" : money(discount.value, discount.currency, lang)); }
+    else $("#codeMsg").textContent = t("badCode"); } catch (e) { $("#codeMsg").textContent = t("badCode"); }
+  s5(); };
+$("#wReceipt").onchange = async e => { const f = e.target.files[0]; if (!f) return; try { G.receipt = (await compressImage(f, 1400, .75)).data; $("#rcPrev").src = G.receipt; $("#rcPrev").classList.remove("hidden"); toast(t("receiptOk")); } catch (x) {} };
+
+function readStep() {
+  if (step === 1) read1();
+  if (step === 3) G.music = $("#wMusic").value.trim();
+  if (step === 4) { const v = $("#wOpen").value; G.openAtMs = v ? new Date(v).getTime() : null; }
+  if (step === 5) G.contact = { ...(G.contact || {}), phone: $("#wPhone").value.trim(), name: user.displayName || "", email: user.email || "" };
+}
+function validate() {
+  const R = t("req");
+  if (step === 0 && !G.packageId) return R.pkg;
+  if (step === 1) { if (!G.recipient) return R.to; if (!G.sender) return R.from; }
+  if (step === 2) { const live = photos.filter(p => !p.gone); if (!live.length) return R.photos; if (live.some(p => !p.date)) return R.dates; if (live.length > maxPhotos()) return T[lang].tooMany(fmtNum(maxPhotos(), lang)); }
+  if (step === 3 && G.music && !/^https:\/\/(www\.|m\.)?(youtube\.com|youtu\.be)\//i.test(G.music)) return t("badYt");
+  if (step === 4 && !G.openAtMs) return R.open;
+  if (step === 5) { if (!phoneOk(normalizePhone(G.contact.phone))) return R.phone; if (!G.receipt) return R.receipt; }
+  return "";
+}
+async function saveDraft(submit) {
+  const { total, off } = currentTotal(); const pk = pricing.packages.find(p => p.id === G.packageId) || {};
+  const data = { owner: user.uid, status: submit ? "pending" : "draft", type: G.type, currency: G.currency, packageId: G.packageId,
+    visitors: pk.visitors || 4, months: pk.months || 12, sideRoom: !!G.sideRoom, title: G.title || t("defTitle"), recipient: G.recipient, sender: G.sender, dedication: G.dedication,
+    company: G.type === "company" ? { name: G.company?.name || "", logo: G.company?.logo || "" } : { name: "", logo: "" }, template: G.template || "classic", music: G.music || "",
+    openAt: G.openAtMs ? fs.Timestamp.fromMillis(G.openAtMs) : null, contact: { phone: normalizePhone(G.contact?.phone), name: user.displayName || "", email: user.email || "" },
+    discountCode: G.discountCode || "", discountOff: off, price: total, receipt: G.receipt || "", photoCount: photos.filter(p => !p.gone).length, lang, updatedAt: fs.serverTimestamp() };
+  if (submit) data.submittedAt = fs.serverTimestamp();
+  if (!G.id) { G.id = randomId(10); data.createdAt = fs.serverTimestamp(); data.status = "draft"; await fs.setDoc(fs.doc(db, "galleries", G.id), data); if (submit) await fs.updateDoc(fs.doc(db, "galleries", G.id), { status: "pending", submittedAt: fs.serverTimestamp() }); }
+  else await fs.updateDoc(fs.doc(db, "galleries", G.id), data);
+  G.status = data.status;
+  for (const id of removed.splice(0)) await fs.deleteDoc(fs.doc(db, "galleries", G.id, "photos", id));
+  for (const p of photos) { if (p.gone || !p.dirty) continue; if (!p.id) p.id = randomId(8);
+    await fs.setDoc(fs.doc(db, "galleries", G.id, "photos", p.id), { img: p.img, date: p.date || "", title: (p.title || "").slice(0, 40), caption: (p.caption || "").slice(0, 160) }); p.dirty = false; }
+  photos = photos.filter(p => !p.gone);
+}
+$("#nextBtn").onclick = async () => {
+  readStep(); const err = validate(); if (err) return toast(err, "bad");
+  const b = $("#nextBtn"); b.disabled = true; const old = b.textContent; b.textContent = t("saving");
+  try { await saveDraft(step === N_STEPS - 1);
+    if (step === N_STEPS - 1) { toast(t("submitted")); show("vHome"); renderList(); } else { step++; renderStep(); scrollTo(0, 0); } }
+  catch (e) { console.error(e); toast(e.code === "permission-denied" ? t("permission") : (t("loadErr") + " " + (e.code || "")), "bad"); }
+  finally { b.disabled = false; b.textContent = old; if (!$("#vWizard").classList.contains("hidden")) renderStep(); }
+};
+$("#backBtn").onclick = () => { readStep(); if (step === 0) { show("vHome"); renderList(); } else { step--; renderStep(); scrollTo(0, 0); } };
+
+/* ---------- public feedback ---------- */
+let fbType = "feedback";
+$$("#fbType button").forEach(b => b.addEventListener("click", () => { fbType = b.dataset.v; $$("#fbType button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); }));
+$("#fbForm").onsubmit = async ev => { ev.preventDefault(); const text = $("#fbText").value.trim(); if (!text) return toast(t("fbEmpty"), "bad");
+  try { await fs.addDoc(fs.collection(db, "feedback"), { text: text.slice(0, 1000), name: $("#fbName").value.trim().slice(0, 40), type: fbType, at: fs.serverTimestamp(), lang });
+        $("#fbText").value = ""; toast(t("fbThanks")); } catch (e) { toast(t("loadErr"), "bad"); } };
+
+addEventListener("ag-installable", () => $("#instBtn").classList.remove("hidden"));
+$("#instBtn").onclick = async () => { await promptInstall(); $("#instBtn").classList.add("hidden"); };
+applyLang();
+</script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function uid() { return request.auth.uid; }
+    function roleDoc() { return /databases/$(database)/documents/roles/$(request.auth.uid); }
+    function hasRole() { return signedIn() && exists(roleDoc()); }
+    function isAdmin() { return hasRole() && get(roleDoc()).data.role == 'admin'; }
+    function isStaff() { return hasRole() && get(roleDoc()).data.role in ['admin', 'staff', 'marketer']; }
+
+    // The very first person can make themselves admin, once
+    match /config/bootstrap {
+      allow get: if signedIn();
+      allow create: if signedIn() && request.resource.data.by == uid()
+                    && getAfter(/databases/$(database)/documents/roles/$(uid())).data.role == 'admin';
+    }
+    match /roles/{u} {
+      allow get: if signedIn() && (uid() == u || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isAdmin()
+        || (signedIn() && uid() == u && request.resource.data.role == 'admin'
+            && !exists(/databases/$(database)/documents/config/bootstrap)
+            && getAfter(/databases/$(database)/documents/config/bootstrap).data.by == u);
+      allow update, delete: if isAdmin();
+    }
+    match /staffRequests/{u} {
+      allow create, update: if signedIn() && uid() == u;
+      allow get: if signedIn() && (uid() == u || isAdmin());
+      allow list, delete: if isAdmin();
+    }
+
+    // Prices and bank details: everyone reads, admin writes
+    match /settings/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    // Discount codes: a signed-in customer can check one code by name; only admin lists or edits
+    match /discounts/{code} {
+      allow get: if signedIn();
+      allow list, write: if isAdmin();
+    }
+    // Public opinions / complaints box
+    match /feedback/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['text', 'name', 'type', 'at', 'lang'])
+                    && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000
+                    && request.resource.data.name is string && request.resource.data.name.size() <= 40
+                    && request.resource.data.type in ['feedback', 'suggestion', 'complaint'];
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Customer orders (drafts until paid)
+    match /galleries/{gid} {
+      function owns() { return signedIn() && resource.data.owner == uid(); }
+      allow get, list: if owns() || isAdmin();
+      allow create: if signedIn() && request.resource.data.owner == uid() && request.resource.data.status == 'draft';
+      allow update: if isAdmin()
+        || (owns() && resource.data.status in ['draft', 'rejected']
+            && request.resource.data.status in ['draft', 'pending']
+            && request.resource.data.owner == resource.data.owner);
+      allow delete: if isAdmin() || (owns() && resource.data.status == 'draft');
+
+      function galleryOwner() { return get(/databases/$(database)/documents/galleries/$(gid)).data.owner; }
+      match /photos/{pid} {
+        allow read, write: if isAdmin() || (signedIn() && galleryOwner() == uid());
+      }
+      match /private/{d} {
+        allow read: if isAdmin() || (signedIn() && galleryOwner() == uid());
+        allow write: if isAdmin();
+      }
+    }
+
+    // Public waiting-page info (title, opening time, logo)
+    match /teasers/{gid} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow create: if isStaff();
+      allow update: if isAdmin() || (signedIn() && resource.data.owner == uid() && request.resource.data.owner == resource.data.owner);
+      allow delete: if isAdmin();
+    }
+
+    // The museum itself: its id is derived from the gallery id + the 4-digit code
+    match /vaults/{key} {
+      function v() { return get(/databases/$(database)/documents/vaults/$(key)).data; }
+      function isOpen(d) { return request.time >= d.openAt && (!('expiresAt' in d) || d.expiresAt == null || request.time < d.expiresAt); }
+      function vOwner(d) { return signedIn() && d.owner == uid(); }
+      allow get: if isOpen(resource.data) || vOwner(resource.data) || isStaff();
+      allow list: if false;
+      allow create: if isStaff();
+      allow update: if isAdmin() || (vOwner(resource.data) && request.resource.data.owner == resource.data.owner
+                                     && request.resource.data.status == resource.data.status && request.resource.data.expiresAt == resource.data.expiresAt);
+      allow delete: if isAdmin();
+      match /photos/{pid} {
+        allow read: if isOpen(v()) || vOwner(v()) || isStaff();
+        allow write: if isAdmin() || vOwner(v());
+      }
+      // Each visitor keeps their own likes and comments; the museum owner can remove any comment
+      match /social/{u} {
+        allow read: if isOpen(v()) || vOwner(v()) || isAdmin();
+        allow create, update: if signedIn() && ((uid() == u && isOpen(v())) || vOwner(v()));
+        allow delete: if signedIn() && (uid() == u || vOwner(v()) || isAdmin());
+      }
+    }
+
+    // One trial per phone number (the document id is the phone)
+    match /trials/{phone} {
+      allow create: if isStaff();
+      allow read: if isStaff();
+      allow update, delete: if isAdmin();
+    }
+  }
+}
