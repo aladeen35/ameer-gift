@@ -1,0 +1,94 @@
+name: Firebase setup (rules, anonymous sign-in, live visitors)
+
+# Turns on everything the site needs in the Firebase project, from GitHub, without the console:
+#  - publishes firestore.rules and database.rules.json
+#  - creates the Realtime Database (europe-west1) if it does not exist yet
+#  - enables anonymous sign-in for visitors and adds the site domain to the authorized domains
+# Needs one repository secret: FIREBASE_SERVICE_ACCOUNT (the JSON key from Firebase > Project settings > Service accounts).
+# Runs on demand, and again by itself whenever the rules change on main.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["firestore.rules", "database.rules.json", ".github/workflows/firebase-setup.yml"]
+
+permissions:
+  contents: read
+
+env:
+  PROJECT: ameer-gift
+  RTDB_INSTANCE: ameer-gift-default-rtdb
+  RTDB_REGION: europe-west1
+  SITE_DOMAIN: aladeen35.github.io
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the key is there
+        env: { SA: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" }
+        run: |
+          if [ -z "$SA" ]; then
+            echo "::error::Add the FIREBASE_SERVICE_ACCOUNT secret first (see docs/OWNER-STEPS-AR.md)"; exit 1
+          fi
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+
+      - name: Publish Firestore rules
+        id: fsrules
+        continue-on-error: true
+        run: npx firebase deploy --only firestore:rules --project "$PROJECT" --non-interactive
+
+      - name: Create the Realtime Database (only the first time)
+        id: rtdb
+        continue-on-error: true
+        run: |
+          if npx firebase database:instances:list --project "$PROJECT" 2>/dev/null | grep -q "$RTDB_INSTANCE"; then
+            echo "Realtime Database already exists"
+          else
+            npx firebase database:instances:create "$RTDB_INSTANCE" --location "$RTDB_REGION" --project "$PROJECT" --non-interactive
+          fi
+
+      - name: Publish Realtime Database rules
+        id: dbrules
+        continue-on-error: true
+        run: npx firebase deploy --only database --project "$PROJECT" --non-interactive
+
+      - name: Enable anonymous sign-in and authorize the site domain
+        id: auth
+        continue-on-error: true
+        run: |
+          TOKEN=$(gcloud auth print-access-token)
+          API="https://identitytoolkit.googleapis.com/admin/v2/projects/$PROJECT/config"
+          CUR=$(curl -sf -H "Authorization: Bearer $TOKEN" -H "x-goog-user-project: $PROJECT" "$API")
+          DOMAINS=$(echo "$CUR" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const c=JSON.parse(s);const d=new Set(c.authorizedDomains||[]);d.add(process.env.SITE_DOMAIN);console.log(JSON.stringify([...d]))})')
+          BODY=$(node -e 'console.log(JSON.stringify({signIn:{anonymous:{enabled:true}},authorizedDomains:JSON.parse(process.argv[1])}))' "$DOMAINS")
+          curl -sf -X PATCH -H "Authorization: Bearer $TOKEN" -H "x-goog-user-project: $PROJECT" -H "Content-Type: application/json" \
+            "$API?updateMask=signIn.anonymous.enabled,authorizedDomains" -d "$BODY" > /dev/null
+          echo "anonymous sign-in on, domains: $DOMAINS"
+
+      - name: Check everything from the outside
+        if: always()
+        run: |
+          API_KEY=$(grep -o 'apiKey: "[^"]*"' src/config.js | cut -d'"' -f2)
+          FS=$(curl -s -o /dev/null -w "%{http_code}" "https://firestore.googleapis.com/v1/projects/$PROJECT/databases/(default)/documents/teasers/__check__")
+          AN=$(curl -s -X POST -H "Content-Type: application/json" -d '{"returnSecureToken":true}' "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=$API_KEY" | grep -c idToken || true)
+          DB=$(curl -s -o /dev/null -w "%{http_code}" "https://$RTDB_INSTANCE.$RTDB_REGION.firebasedatabase.app/presence.json")
+          ok() { [ "$1" = "$2" ] && echo "✅" || echo "❌"; }
+          {
+            echo "### نتيجة تفعيل Firebase"
+            echo "| الخطوة | النتيجة |"
+            echo "|---|---|"
+            echo "| قواعد Firestore (صفحة الانتظار تُقرأ للجميع) | $(ok "$FS" 404) ($FS) |"
+            echo "| الدخول المجهول للزوار | $(ok "$AN" 1) |"
+            echo "| قاعدة البيانات اللحظية (مقفلة لغير المسجلين) | $(ok "$DB" 401) ($DB) |"
+            echo "| نشر القواعد: Firestore ${{ steps.fsrules.outcome }} · RTDB ${{ steps.dbrules.outcome }} · إنشاء RTDB ${{ steps.rtdb.outcome }} · الدخول ${{ steps.auth.outcome }} | |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          cat "$GITHUB_STEP_SUMMARY"
+          [ "$FS" = 404 ] && [ "$AN" = 1 ]
