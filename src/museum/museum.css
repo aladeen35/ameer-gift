@@ -138,6 +138,8 @@ dialog h2{font-size:20px;margin-bottom:14px}
 .setrow{display:grid;gap:8px;margin-bottom:12px}
 .setrow>span{font-size:14px;color:var(--muted)}
 dialog .acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:12px}
+.setlinks{display:flex;flex-wrap:wrap;gap:0 16px;margin:4px 0 0}
+.setlinks a{display:inline-flex;align-items:center;min-height:44px;color:var(--muted);font-size:14px;text-decoration:underline;text-underline-offset:3px}
 
 /* viewer: full-screen painting like a gallery close-up */
 #viewer{position:fixed;inset:0;z-index:30;background:radial-gradient(ellipse at 50% 20%,#F4EFE6 0%,#D9D2C6 55%,#B8B0A3 100%);overflow:auto;padding:calc(var(--sat) + 16px) 14px calc(var(--sab) + 16px);touch-action:pan-y;user-select:text}

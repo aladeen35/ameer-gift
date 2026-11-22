@@ -174,7 +174,8 @@
     <textarea class="in" id="fbText" maxlength="1000"></textarea>
     <button class="btn" data-t="send"></button>
   </form>
-  <p class="muted small" style="margin-top:22px;text-align:center">© هدايا أمير · Ameer Gift</p>
+  <nav class="flinks" aria-label="Albushra"><a id="aboutLnk" href="about.html" data-t="aboutDev"></a><a id="privLnk" href="privacy.html" data-t="privacy"></a></nav>
+  <p class="muted small" style="margin-top:10px;text-align:center">© هدايا أمير · Ameer Gift</p>
 </div></footer>
 
 <dialog id="dlg"><div class="dbody" id="dlgBody"></div></dialog>
@@ -200,7 +201,7 @@ const T = {
   phone:"رقم جوالك (واتساب)",bankH:"حوّل المبلغ إلى الحساب التالي، ثم ارفع صورة الإشعار",bankName:"البنك",accName:"اسم صاحب الحساب",accNo:"رقم الحساب",receipt:"رفع صورة إشعار التحويل",receiptOk:"تم إرفاق الإشعار ✓",
   back:"رجوع",next:"التالي",submit:"إرسال الطلب",saving:"جارٍ الحفظ…",saved:"تم الحفظ",submitted:"تم إرسال طلبك. سنراجع التحويل قريبًا.",
   req:{to:"اكتب اسم المُهدى إليه",from:"اكتب اسمك",photos:"أضف صورة واحدة على الأقل",dates:"اكتب تاريخ كل صورة",open:"اختر موعد الفتح",phone:"اكتب رقم جوالك مع رمز الدولة، مثل 966 أو 249",receipt:"ارفع صورة إشعار التحويل",pkg:"اختر باقة"},
-  fbH:"رأيك يهمنا",fbP:"اكتب رأيك أو اقتراحك أو شكواك، وتصل مباشرة لفريق هدايا أمير.",fbOpinion:"رأي",fbSuggest:"اقتراح",fbComplaint:"شكوى",fbName:"اسمك (اختياري)",fbText:"اكتب هنا",send:"إرسال",fbThanks:"شكرًا، وصلتنا رسالتك",fbEmpty:"اكتب رسالتك أولًا",
+  fbH:"رأيك يهمنا",fbP:"اكتب رأيك أو اقتراحك أو شكواك، وتصل مباشرة لفريق هدايا أمير.",fbOpinion:"رأي",fbSuggest:"اقتراح",fbComplaint:"شكوى",fbName:"اسمك (اختياري)",fbText:"اكتب هنا",send:"إرسال",fbThanks:"شكرًا، وصلتنا رسالتك",fbEmpty:"اكتب رسالتك أولًا",aboutDev:"عن المطور والمنظومة",privacy:"سياسة الخصوصية",
   defTitle:"معرض ذكرياتنا",permission:"لا تملك صلاحية لهذه العملية",loadErr:"تعذّر تحميل البيانات",
   tryDemo:"جرّب متحفًا تجريبيًا الآن",hideCredit:"إخفاء عبارة «من هدايا أمير» داخل المعرض",editM:"تعديل المعرض",editH:"تعديل المعرض بعد التفعيل",editP:"التعديلات تظهر للزوار مباشرة. الصور نفسها لا تتغير بعد التفعيل.",save:"حفظ التعديلات",visitsN:n=>`${n} زيارة`,editPhotos:"عناوين الصور وتعليقاتها",close:"إغلاق",modNote:"لحذف تعليق، افتح المعرض وأنت مسجّل الدخول، وستظهر لك أزرار الحذف."},
  en:{install:"Install app",heroT:"A 3D memories museum, gifted to someone you love",f1n:"3D",f2n:"28",heroP:"Upload your photos, pick the decor, music and opening time, and we prepare a museum your loved ones walk through together.",f1:"A museum to walk",f2:"photos at most",f3:"A countdown surprise",
@@ -217,13 +218,14 @@ const T = {
   phone:"Your mobile (WhatsApp)",bankH:"Transfer the amount to this account, then upload the receipt",bankName:"Bank",accName:"Account holder",accNo:"Account number",receipt:"Upload transfer receipt",receiptOk:"Receipt attached ✓",
   back:"Back",next:"Next",submit:"Send order",saving:"Saving…",saved:"Saved",submitted:"Your order was sent. We will check the transfer soon.",
   req:{to:"Enter the recipient's name",from:"Enter your name",photos:"Add at least one photo",dates:"Set a date for every photo",open:"Choose the opening time",phone:"Enter your mobile with the country code, like 966 or 249",receipt:"Upload the transfer receipt",pkg:"Choose a package"},
-  fbH:"We value your opinion",fbP:"Share an opinion, suggestion or complaint. It goes straight to the Ameer Gift team.",fbOpinion:"Opinion",fbSuggest:"Suggestion",fbComplaint:"Complaint",fbName:"Your name (optional)",fbText:"Write here",send:"Send",fbThanks:"Thank you, we received your message",fbEmpty:"Write your message first",
+  fbH:"We value your opinion",fbP:"Share an opinion, suggestion or complaint. It goes straight to the Ameer Gift team.",fbOpinion:"Opinion",fbSuggest:"Suggestion",fbComplaint:"Complaint",fbName:"Your name (optional)",fbText:"Write here",send:"Send",fbThanks:"Thank you, we received your message",fbEmpty:"Write your message first",aboutDev:"About the developer",privacy:"Privacy policy",
   defTitle:"Our Memories Museum",permission:"You don't have permission for this",loadErr:"Could not load data",
   tryDemo:"Try a demo museum now",hideCredit:"Hide the \"by Ameer Gift\" line inside the museum",editM:"Edit museum",editH:"Edit the museum after activation",editP:"Changes show to visitors right away. The photos themselves stay as they are after activation.",save:"Save changes",visitsN:n=>`${n} visits`,editPhotos:"Photo titles and captions",close:"Close",modNote:"To delete a comment, open the museum while signed in and the delete buttons appear."}};
 const t = k => T[lang][k];
 function applyLang() {
   document.documentElement.lang = lang; document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
   $$("[data-t]").forEach(e => { const v = t(e.dataset.t); if (typeof v === "string") e.textContent = v; });
+  $("#aboutLnk").href = `about.html?lang=${lang}`; $("#privLnk").href = `privacy.html?lang=${lang}`;
   $("#langBtn").textContent = lang === "ar" ? "EN" : "عربي"; $("#langBtn").setAttribute("aria-label", lang === "ar" ? "English" : "العربية");
   $("#outBtn").textContent = t("out"); $("#instBtn").textContent = t("install"); $("#fbName").placeholder = t("fbName"); $("#fbText").placeholder = t("fbText"); $("#wCode").placeholder = t("codePh");
   $$("#curSeg button").forEach(b => b.textContent = CURRENCIES[b.dataset.v][lang]);

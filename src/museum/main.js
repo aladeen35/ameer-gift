@@ -100,7 +100,7 @@ function applyLang() {
   $("#tFull").setAttribute("aria-label", t("full")); $("#tFull").textContent = "⛶"; $("#tSet").setAttribute("aria-label", t("settings")); $("#tSet").textContent = "⚙";
   $("#setT").textContent = t("settings"); $("#setQ").textContent = t("quality"); $$("#qseg button").forEach(b => { b.textContent = t("q")[b.dataset.q]; b.setAttribute("aria-pressed", String(b.dataset.q === tier)); });
   $("#setL").textContent = t("langL"); $("#setM").textContent = t("motion"); $("#setMotion").textContent = reduceMotion() ? t("on") : t("off"); $("#setMotion").setAttribute("aria-pressed", String(reduceMotion()));
-  $("#setInfo").textContent = tierInfo.auto ? t("auto") : ""; $("#setCred").textContent = t("credits"); $("#exit").textContent = t("exit"); $("#setClose").textContent = t("close");
+  $("#setInfo").textContent = tierInfo.auto ? t("auto") : ""; $("#setCred").textContent = t("credits"); $("#setAbout").textContent = t("aboutDev"); $("#setAbout").href = `about.html?lang=${L}`; $("#setPriv").textContent = t("privacy"); $("#setPriv").href = `privacy.html?lang=${L}`; $("#exit").textContent = t("exit"); $("#setClose").textContent = t("close");
   $("#vclose").textContent = t("back"); $("#ctext").placeholder = t("cph"); $("#ctext").setAttribute("aria-label", t("caria")); $("#csend").textContent = t("send");
   $("#sit").textContent = my?.sitting ? t("stand") : t("sit");
   updateSoonDate(); lastCd = "";
@@ -416,7 +416,9 @@ $$("#emotes button").forEach(b => b.onclick = () => { $("#emotes").classList.add
 function doEmote(e) { if (!my) return; my.emote(e); presence?.send({ e, et: Date.now() }, true); }
 $("#tSound").onclick = () => { sound.unlock(); sound.setMuted(!sound.muted); $("#tSound").textContent = sound.muted ? "🔇" : "🔊"; $("#tSound").setAttribute("aria-pressed", String(sound.muted)); };
 $("#tFull").onclick = () => { const d = document; if (d.fullscreenElement) d.exitFullscreen?.(); else d.documentElement.requestFullscreen?.({ navigationUI: "hide" }).catch(() => {}); };
-$("#tSet").onclick = () => { applyLang(); $("#settings").showModal(); };
+$("#tSet").onclick = () => { applyLang(); $("#exit").classList.remove("hidden"); $("#settings").showModal(); };
+// The entrance info button opens the same settings sheet (credits, about, privacy), without "exit"
+$("#credBtn").onclick = () => { applyLang(); $("#exit").classList.add("hidden"); $("#settings").showModal(); };
 $("#setClose").onclick = () => $("#settings").close();
 $$("#qseg button").forEach(b => b.onclick = () => { if (b.dataset.q === tier) return; saveTier(b.dataset.q); location.reload(); });
 $("#setMotion").onclick = () => { document.documentElement.classList.toggle("reduce"); try { localStorage.setItem("ag-reduce", reduceMotion() ? "1" : ""); } catch (e) {} applyLang(); };
