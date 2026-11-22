@@ -1,14 +1,14 @@
 // Public project settings. None of these are secrets: Firebase web keys are designed to ship to the browser.
 export const CONFIG = {
   firebase: {
-    apiKey: "AIzaSyCI9WPKvYbDmac8zXeatAivmVBGyS-CtIc",
-    authDomain: "ameer-gift.firebaseapp.com",
-    projectId: "ameer-gift",
-    storageBucket: "ameer-gift.firebasestorage.app",
-    messagingSenderId: "276474821835",
-    appId: "1:276474821835:web:2c3bba0be6692da6746f4e",
+    apiKey: "AIzaSyDlT9WCSoDFDFtuKbhi5__CkndYLfTSIes",
+    authDomain: "ameer-gift-fc5a8.firebaseapp.com",
+    projectId: "ameer-gift-fc5a8",
+    storageBucket: "ameer-gift-fc5a8.firebasestorage.app",
+    messagingSenderId: "316662776940",
+    appId: "1:316662776940:web:2498eacc25990c10c9c449",
     // Realtime Database (live visitors). If the owner picks another location, copy the URL from the console here.
-    databaseURL: "https://ameer-gift-default-rtdb.europe-west1.firebasedatabase.app",
+    databaseURL: "https://ameer-gift-fc5a8-default-rtdb.europe-west1.firebasedatabase.app",
   },
   // reCAPTCHA v3 site key for App Check. Leave empty until App Check is set up in the console.
   appCheckSiteKey: "",

@@ -20,7 +20,7 @@
 تعطي GitHub مفتاحًا لمشروع Firebase مرة واحدة، وهو ينفّذ كل الإعدادات بنفسه، ويعيد نشر القواعد تلقائيًا كلما تغيّرت.
 
 **أ) أنشئ المفتاح من Firebase**
-1. افتح `console.firebase.google.com` ← مشروع **ameer-gift**.
+1. افتح `console.firebase.google.com` ← مشروع **ameer-gift-fc5a8**.
 2. اضغط رمز الترس ⚙ بجانب «Project Overview» ← **Project settings**.
 3. افتح تبويب **Service accounts**.
 4. اضغط **Generate new private key** ← **Generate key**. سيُنزَّل ملف ينتهي بـ `.json`.
@@ -44,7 +44,7 @@
 
 القواعد الحالية في مشروعك تمنع القراءة تمامًا، لذلك لن يعمل الموقع حتى تلصق القواعد الجديدة.
 
-1. افتح `console.firebase.google.com` ← مشروع **ameer-gift**.
+1. افتح `console.firebase.google.com` ← مشروع **ameer-gift-fc5a8**.
 2. القائمة ☰ ← **Build** ← **Firestore Database** ← تبويب **Rules**.
 3. احذف كل النص الموجود، والصق محتوى الملف `firestore.rules` من المستودع كاملًا.
    (لنسخه من الجوال: افتح الملف في GitHub ← زر **Raw** ← تحديد الكل ← نسخ.)
@@ -71,7 +71,7 @@
 2. الموقع: **Belgium (europe-west1)** ← **Next** ← **Start in locked mode** ← **Enable**.
 3. تبويب **Rules** ← احذف الموجود والصق محتوى الملف `database.rules.json` ← **Publish**.
 4. انسخ رابط قاعدة البيانات الظاهر أعلى الصفحة. إن لم يكن هو
-   `https://ameer-gift-default-rtdb.europe-west1.firebasedatabase.app`
+   `https://ameer-gift-fc5a8-default-rtdb.europe-west1.firebasedatabase.app`
    فأرسله لي لأعدّله في `src/config.js`.
 
 > الخطة المجانية تسمح بـ ١٠٠ اتصال لحظي لكل المعارض معًا. عند تجاوزها يختفي ظهور الزوار الآخرين فقط، ويستمر المعرض في العمل.

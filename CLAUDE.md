@@ -51,7 +51,7 @@ Read this whole file before doing anything. Then explore the repo, propose a pha
 
 ### 4.2 Firebase
 
-- Project id `ameer-gift`, plan **Spark (free)**. Enabled: Authentication (Google, Email/Password), Firestore (production mode). Not yet: Storage, Functions, Realtime Database, App Check, Anonymous auth (needed for visitors).
+- Project id `ameer-gift-fc5a8` (moved from `ameer-gift` in Nov 2026 to the owner's current Google account), plan **Spark (free)**. Enabled: Authentication (Google, Email/Password), Firestore (production mode). Not yet: Storage, Functions, Realtime Database, App Check, Anonymous auth (needed for visitors).
 - Web config is in `shared.js` (public by design).
 - Photos are currently stored **as base64 data URLs inside Firestore documents** (one doc per photo) to stay on the free plan.
 

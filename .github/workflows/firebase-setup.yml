@@ -66,7 +66,21 @@ jobs:
       - name: Publish Firestore rules
         id: fsrules
         continue-on-error: true
-        run: npx firebase deploy --only firestore:rules --project "$PROJECT" --non-interactive
+        run: |
+          # straight to the Rules API (the firebase CLI first asks Service Usage, which this key may not read)
+          TOKEN=$(gcloud auth print-access-token)
+          R="https://firebaserules.googleapis.com/v1/projects/$PROJECT"
+          BODY=$(node -e 'console.log(JSON.stringify({source:{files:[{name:"firestore.rules",content:require("fs").readFileSync("firestore.rules","utf8")}]}}))')
+          RS=$(curl -sS -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" "$R/rulesets" -d "$BODY")
+          NAME=$(echo "$RS" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).name||""))')
+          [ -n "$NAME" ] || { echo "$RS"; exit 1; }
+          REL="{\"release\":{\"name\":\"projects/$PROJECT/releases/cloud.firestore\",\"rulesetName\":\"$NAME\"}}"
+          OUT=$(curl -sS -X PATCH -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" "$R/releases/cloud.firestore" -d "$REL")
+          if ! echo "$OUT" | grep -q rulesetName; then
+            OUT=$(curl -sS -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" "$R/releases" -d "{\"name\":\"projects/$PROJECT/releases/cloud.firestore\",\"rulesetName\":\"$NAME\"}")
+          fi
+          echo "$OUT" | grep -q rulesetName || { echo "$OUT"; exit 1; }
+          echo "Firestore rules released: $NAME"
 
       - name: Create the Realtime Database (first time only)
         id: rtdb
@@ -78,7 +92,10 @@ jobs:
       - name: Publish Realtime Database rules
         id: dbrules
         continue-on-error: true
-        run: npx firebase deploy --only database --project "$PROJECT" --non-interactive
+        run: |
+          TOKEN=$(gcloud auth print-access-token --scopes=https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/firebase.database,https://www.googleapis.com/auth/userinfo.email)
+          OUT=$(curl -sS -X PUT -H "Authorization: Bearer $TOKEN" "https://$RTDB_INSTANCE.$REGION.firebasedatabase.app/.settings/rules.json" --data-binary @database.rules.json)
+          echo "$OUT"; echo "$OUT" | grep -q '"status" *: *"ok"'
 
       - name: Enable email and anonymous sign-in, authorize the site domain
         id: auth
