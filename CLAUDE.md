@@ -95,7 +95,9 @@ Done (everything that works on the free Spark plan):
 - Owner console steps: `docs/OWNER-STEPS-AR.md`.
 - Custom domain: **https://amir.albushra.app** (`public/CNAME`, DNS CNAME `amir` → `aladeen35.github.io`). Android TWA host is this domain; `assetlinks.json` goes in `public/.well-known/`.
 
-Still needs Blaze: Storage (songs, video, photo migration), Cloud Functions (AI captions, server-side PIN check, payments).
+AI captions: Gemini through Firebase AI Logic (`src/ai.js`, Gemini Developer API free tier, no server; owner enables AI Logic in the console).
+
+Still needs Blaze: Storage (songs, video, photo migration), Cloud Functions (server-side PIN check, payments).
 
 ## 5. What to build (proposed phases — refine after exploring)
 

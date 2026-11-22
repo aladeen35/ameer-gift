@@ -21,6 +21,7 @@ export default defineConfig({
         manualChunks(id) {
           if (id.includes("node_modules/three")) return "three";
           if (id.includes("node_modules/@firebase/database") || id.includes("node_modules/firebase/database")) return "firebase-db";
+          if (id.includes("node_modules/@firebase/ai") || id.includes("node_modules/firebase/ai")) return "firebase-ai";
           if (id.includes("node_modules/@firebase") || id.includes("node_modules/firebase")) return "firebase";
           if (id.includes("/src/shared.js") || id.includes("/src/config.js") || id.includes("rolldown") || id.includes("\0")) return "shared";
         },

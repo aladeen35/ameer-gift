@@ -124,6 +124,7 @@
     <div class="wstep" data-step="2">
       <h2 data-t="s2h" style="margin-bottom:6px"></h2>
       <p class="hint" style="margin:0 0 14px" data-t="s2p"></p>
+      <p class="hint" style="margin:-8px 0 14px" data-t="aiNote"></p>
       <label class="drop" id="drop"><input type="file" id="wFiles" accept="image/*" multiple><b data-t="addPhotos"></b><span class="count" id="phCount"></span></label>
       <div class="photos" id="phList" style="margin-top:14px"></div>
     </div>
@@ -192,7 +193,7 @@ const T = {
   steps:["الباقة","الإهداء","الصور","الديكور والموسيقى","موعد الفتح","الدفع"],stepOf:(a,b)=>`الخطوة ${a} من ${b}`,
   s0h:"اختر الباقة",individual:"أفراد",company:"شركات",visitors:n=>`حتى ${n} زوار معًا`,months:n=>`يبقى المعرض ${n} شهرًا`,sideRoom:"غرفة جانبية",sideRoomD:"تضاعف عدد الصور من ١٤ إلى ٢٨",
   s1h:"بطاقة الإهداء",mTitle:"عنوان المعرض",recipient:"إلى",sender:"من",dedText:"نص الإهداء",dedHint:"هذا النص يظهر على بطاقة المدخل، وتستطيع تعديله لاحقًا.",coName:"اسم الشركة",coLogo:"رفع شعار الشركة",coLogoHint:"PNG بخلفية شفافة أفضل. يظهر الشعار مكان شعار هدايا أمير.",
-  s2h:"صور الذكريات",s2p:"ارفع كل الصور مرة واحدة، واكتب تاريخ كل صورة. ستترتب في المعرض من الأقدم إلى الأحدث.",addPhotos:"اختر الصور",of:(a,b)=>`${a} من ${b}`,date:"التاريخ",title:"العنوان",caption:"التعليق",ai:"اقتراح تعليق بالذكاء الاصطناعي (قريبًا)",remove:"إزالة",tooMany:n=>`الحد الأقصى ${n} صورة في هذه الباقة`,
+  s2h:"صور الذكريات",s2p:"ارفع كل الصور مرة واحدة، واكتب تاريخ كل صورة. ستترتب في المعرض من الأقدم إلى الأحدث.",addPhotos:"اختر الصور",of:(a,b)=>`${a} من ${b}`,date:"التاريخ",title:"العنوان",caption:"التعليق",ai:"اقتراح عنوان وتعليق بالذكاء الاصطناعي",aiBusy:"يكتب الذكاء الاصطناعي…",aiOff:"الذكاء الاصطناعي غير مفعّل بعد في Firebase. فعّله من لوحة Firebase ثم جرّب مرة أخرى.",aiErr:"تعذّر اقتراح تعليق الآن، حاول بعد قليل.",aiLimit:"وصلت للحد الأقصى من الاقتراحات لهذا المعرض.",aiNote:"✨ يقترح عنوانًا وتعليقًا من الصورة نفسها، وتستطيع تعديلهما.",remove:"إزالة",tooMany:n=>`الحد الأقصى ${n} صورة في هذه الباقة`,
   s3h:"شكل المعرض",tpl:{classic:["الكلاسيكي الذهبي","جدران كحلية، نجف ذهبي، وإضاءة دافئة"],garden:["الحديقة","خضرة ونخيل وفوانيس وأرضية حجرية"],wedding:["الزفاف","أبيض ووردي، قوس زهور ونجف كريستال"],grad:["التخرج","كحلي وسماوي، أعلام ملوّنة وأرضية خشب"]},music:"رابط الموسيقى من يوتيوب (اختياري)",musicHint:"رفع ملف أغنية من جوالك سيتوفر قريبًا. تأكد أن لك حق استخدام الموسيقى.",badYt:"الرابط ليس من يوتيوب",
   s4h:"متى يُفتح المعرض؟",openAt:"تاريخ ووقت الفتح",openHint:"قبل هذا الموعد يرى الزوار صفحة انتظار بعدّ تنازلي، ثم يُفتح المعرض تلقائيًا.",openNow:"افتحه فور التفعيل",
   s5h:"المراجعة والدفع",pkg:"الباقة",photos:"الصور",rooms:"القاعات",opens:"الفتح",immediately:"فور التفعيل",price:"السعر",discount:"الخصم",apply:"تطبيق",codePh:"كود الخصم",badCode:"الكود غير صالح أو منتهي",codeOk:v=>`تم تطبيق خصم ${v}`,total:"الإجمالي",
@@ -209,7 +210,7 @@ const T = {
   steps:["Package","Dedication","Photos","Decor & music","Opening","Payment"],stepOf:(a,b)=>`Step ${a} of ${b}`,
   s0h:"Choose a package",individual:"Individuals",company:"Companies",visitors:n=>`Up to ${n} visitors together`,months:n=>`Stays open ${n} months`,sideRoom:"Side room",sideRoomD:"Doubles photos from 14 to 28",
   s1h:"Dedication card",mTitle:"Museum title",recipient:"To",sender:"From",dedText:"Dedication text",dedHint:"This text appears on the entrance card, and you can edit it later.",coName:"Company name",coLogo:"Upload company logo",coLogoHint:"A transparent PNG works best. It replaces the Ameer Gift logo.",
-  s2h:"Memory photos",s2p:"Upload all photos at once and set each photo's date. They are arranged from oldest to newest.",addPhotos:"Choose photos",of:(a,b)=>`${a} of ${b}`,date:"Date",title:"Title",caption:"Caption",ai:"Suggest a caption with AI (soon)",remove:"Remove",tooMany:n=>`This package allows ${n} photos`,
+  s2h:"Memory photos",s2p:"Upload all photos at once and set each photo's date. They are arranged from oldest to newest.",addPhotos:"Choose photos",of:(a,b)=>`${a} of ${b}`,date:"Date",title:"Title",caption:"Caption",ai:"Suggest a title and caption with AI",aiBusy:"AI is writing…",aiOff:"AI is not turned on in Firebase yet. Enable it in the Firebase console and try again.",aiErr:"Could not suggest a caption right now, try again shortly.",aiLimit:"You reached the suggestion limit for this museum.",aiNote:"✨ suggests a title and caption from the photo itself, and you can edit them.",remove:"Remove",tooMany:n=>`This package allows ${n} photos`,
   s3h:"Museum style",tpl:{classic:["Classic Gold","Navy walls, gold chandeliers, warm light"],garden:["Garden","Greenery, palms, lanterns and stone floor"],wedding:["Wedding","White and blush, a flower arch and crystal chandeliers"],grad:["Graduation","Navy and sky, bunting and a wooden floor"]},music:"Music link from YouTube (optional)",musicHint:"Uploading a song file from your phone is coming soon. Make sure you have the right to use the music.",badYt:"This is not a YouTube link",
   s4h:"When does the museum open?",openAt:"Opening date and time",openHint:"Before this time visitors see a waiting page with a countdown, then the museum opens by itself.",openNow:"Open as soon as it is activated",
   s5h:"Review and pay",pkg:"Package",photos:"Photos",rooms:"Halls",opens:"Opens",immediately:"On activation",price:"Price",discount:"Discount",apply:"Apply",codePh:"Discount code",badCode:"Invalid or expired code",codeOk:v=>`Discount applied: ${v}`,total:"Total",
@@ -380,9 +381,27 @@ function renderPhotos() {
     const ca = el("input", { class: "in", value: p.caption || "", placeholder: t("caption"), maxlength: "160" }); ca.oninput = () => { p.caption = ca.value; p.dirty = true; };
     return el("div", { class: "ph" }, el("img", { src: p.img, alt: p.title || "" }),
       el("div", { class: "fields" }, d, ti, ca, el("div", { class: "tools" },
-        el("button", { class: "btn sm ghost", disabled: true, title: t("ai"), text: "✨" }),
+        el("button", { class: "btn sm ghost", title: t("ai"), "aria-label": t("ai"), text: "✨", onclick: e => aiSuggest(p, ti, ca, e.currentTarget) }),
         el("button", { class: "btn sm danger", text: t("remove"), onclick: () => { p.gone = true; if (p.id) removed.push(p.id); renderPhotos(); } }))));
   }));
+}
+// AI suggestions (Gemini via Firebase AI Logic); limited per order to keep within the free quota
+const AI_LIMIT = 40;
+async function aiSuggest(p, ti, ca, btn) {
+  G.aiUses = G.aiUses || 0; if (G.aiUses >= AI_LIMIT) return toast(t("aiLimit"), "bad");
+  const old = btn.textContent; btn.disabled = true; btn.textContent = "…"; toast(t("aiBusy"));
+  try {
+    const { suggestCaption } = await import("/src/ai.js");
+    const r = await suggestCaption({ img: p.img, title: ti.value.trim(), date: p.date, lang, recipient: G.recipient, sender: G.sender });
+    G.aiUses++;
+    if (r.title && !ti.value.trim()) { ti.value = r.title; p.title = r.title; }
+    if (r.caption) { ca.value = r.caption; p.caption = r.caption; }
+    p.dirty = true;
+  } catch (x) {
+    console.error(x);
+    const m = String(x?.code || "") + " " + String(x?.message || "");
+    toast(/api-not-enabled|not been used|disabled|PERMISSION_DENIED|403|enable/i.test(m) ? t("aiOff") : t("aiErr"), "bad");
+  } finally { btn.disabled = false; btn.textContent = old; }
 }
 $("#wFiles").onchange = async e => {
   const files = [...e.target.files]; e.target.value = ""; const room = maxPhotos() - photos.filter(p => !p.gone).length;

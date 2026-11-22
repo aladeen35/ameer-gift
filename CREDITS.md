@@ -28,6 +28,12 @@ All textures in the museum hall (marble, stone, wood, light pools, plaques) and 
 | Firebase CLI + rules-unit-testing (tests only) | latest | MIT / Apache-2.0 | https://github.com/firebase/firebase-tools |
 | Bubblewrap CLI (Android build) | 1.27.0 | Apache-2.0 | https://github.com/GoogleChromeLabs/bubblewrap |
 
+## Services
+
+| Service | Provider | Used for |
+|---|---|---|
+| Gemini via Firebase AI Logic (Gemini Developer API, free tier) | Google | AI title and caption suggestions in the order wizard |
+
 ## Fonts
 
 | Font | Author | License |
