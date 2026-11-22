@@ -119,6 +119,7 @@ service cloud.firestore {
       allow read: if isAdmin() || (signedIn() && get(/databases/$(database)/documents/galleries/$(gid)).data.owner == uid());
       allow create: if signedIn() && request.resource.data.keys().hasOnly(['count', 'last']) && request.resource.data.count == 1;
       allow update: if signedIn() && request.resource.data.keys().hasOnly(['count', 'last']) && request.resource.data.count == resource.data.count + 1;
+      allow delete: if isAdmin();
     }
 
     // Who did what in the admin panel (activations, rejections, trials, price changes)

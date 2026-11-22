@@ -84,11 +84,11 @@ const T = {
   reqH:"حسابك ليس ضمن الفريق بعد",reqP:"أرسل طلب انضمام، وسيفعّله المدير.",reqBtn:"إرسال طلب انضمام",reqSent:"تم إرسال طلبك، انتظر التفعيل.",
   tabs:{dash:"الأرقام",orders:"الطلبات",trials:"التجارب",pricing:"الأسعار",codes:"أكواد الخصم",feedback:"الآراء والشكاوى",comments:"التعليقات",log:"السجل",team:"الفريق"},
   visits:"زيارات المعارض",topVisited:"الأكثر زيارة",exportCsv:"تصدير الطلبات CSV",hideCredit:"إخفاء «من هدايا أمير» (مميزة)",template:"القالب",contact:"واتساب التواصل (يظهر عند انتهاء التجربة)",hidePrice:"سعر إخفاء عبارة هدايا أمير",
-  modH:"تعليقات الزوار في كل المعارض",modP:"تُعرض أحدث التعليقات في المعارض المفعّلة. الحذف نهائي.",loadMore:"تحميل",logH:"سجل العمليات",act:{activate:"تفعيل",reject:"رفض",trial:"تجربة",pricing:"تعديل الأسعار",code:"كود خصم",deleteComment:"حذف تعليق",role:"صلاحيات"},
+  modH:"تعليقات الزوار في كل المعارض",modP:"تُعرض أحدث التعليقات في المعارض المفعّلة. الحذف نهائي.",loadMore:"تحميل",logH:"سجل العمليات",act:{deleteMuseum:"حذف معرض",activate:"تفعيل",reject:"رفض",trial:"تجربة",pricing:"تعديل الأسعار",code:"كود خصم",deleteComment:"حذف تعليق",role:"صلاحيات"},
   tplName:{classic:"الكلاسيكي الذهبي",garden:"الحديقة",wedding:"الزفاف",grad:"التخرج"},
   galleries:"كل المعارض",pending:"بانتظار التحقق",active:"مفعّلة",drafts:"مسودات",rejected:"مرفوضة",revenue:"المبيعات",thisMonth:"هذا الشهر",trials:"تجارب مرسلة",converted:"تجارب تحولت لشراء",complaints:"شكاوى مفتوحة",feedbacks:"كل الآراء",last14:"الطلبات المرسلة آخر ١٤ يومًا",companies:"معارض شركات",
   st:{draft:"مسودة",pending:"بانتظار التحقق",active:"مفعّل",rejected:"مرفوض"},all:"الكل",customer:"العميل",phone:"الجوال",pkg:"الباقة",visitors:"الزوار",rooms:"القاعات",photos:"الصور",price:"المبلغ",code:"كود الخصم",opens:"الفتح",now:"فور التفعيل",receipt:"الإشعار",noReceipt:"لا يوجد إشعار",
-  activate:"تأكيد الدفع وتفعيل",reject:"رفض",rejectQ:"سبب الرفض (يظهر للعميل):",activating:"جارٍ التفعيل…",activated:"تم التفعيل",sendCust:"إرسال للعميل واتساب",link:"الرابط",pinL:"رمز الدخول",copy:"نسخ",copied:"تم النسخ",none:"لا توجد عناصر",
+  activate:"تأكيد الدفع وتفعيل",delMuseum:"حذف المعرض نهائيًا",delMuseumQ:n=>`حذف المعرض «${n}» مع صوره وتعليقاته ورمز دخوله نهائيًا؟ لا يمكن التراجع.`,delMuseumType:"للتأكيد اكتب كلمة: حذف",delMuseumSure:"لم تكتب «حذف». هل تريد الحذف فعلًا؟",deleting:"جارٍ الحذف…",deleted:"تم حذف المعرض",reject:"رفض",rejectQ:"سبب الرفض (يظهر للعميل):",activating:"جارٍ التفعيل…",activated:"تم التفعيل",sendCust:"إرسال للعميل واتساب",link:"الرابط",pinL:"رمز الدخول",copy:"نسخ",copied:"تم النسخ",none:"لا توجد عناصر",
   trialH:"إرسال تجربة لمدة ساعة",trialP:"تُرسل باسم هدايا أمير ومعظم المميزات، ولا تتكرر لنفس رقم الجوال.",custName:"اسم العميل",custPhone:"جوال العميل مع رمز الدولة",createTrial:"إنشاء التجربة",trialUsed:"هذا الرقم حصل على تجربة من قبل",trialOk:"تم إنشاء التجربة، أرسلها الآن",recentTrials:"آخر التجارب",expired:"منتهية",live:"فعّالة",by:"بواسطة",
   pkgs:"الباقات",addPkg:"إضافة باقة",nameAr:"الاسم بالعربي",nameEn:"الاسم بالإنجليزي",months:"المدة بالأشهر",biz:"باقة شركات",side:"سعر الغرفة الجانبية",bank:"بيانات التحويل",bankName:"البنك",holder:"اسم صاحب الحساب",account:"رقم الحساب",note:"ملاحظة للعميل",save:"حفظ",savedOk:"تم الحفظ",removePkg:"حذف الباقة",
   newCode:"كود جديد",codeL:"الكود",type:"النوع",percent:"نسبة %",amount:"مبلغ ثابت",value:"القيمة",currency:"العملة",maxUses:"عدد الاستخدامات (فارغ = بلا حد)",expires:"ينتهي في (اختياري)",create:"إنشاء",used:"استُخدم",disable:"إيقاف",enable:"تفعيل",del:"حذف",delQ:"تأكيد الحذف؟",exists:"هذا الكود موجود",badCodeName:"الكود حروف إنجليزية وأرقام فقط",
@@ -99,11 +99,11 @@ const T = {
   reqH:"Your account is not on the team yet",reqP:"Send a join request and an admin will approve it.",reqBtn:"Send join request",reqSent:"Request sent, wait for approval.",
   tabs:{dash:"Numbers",orders:"Orders",trials:"Trials",pricing:"Pricing",codes:"Discount codes",feedback:"Feedback",comments:"Comments",log:"Log",team:"Team"},
   visits:"Museum visits",topVisited:"Most visited",exportCsv:"Export orders CSV",hideCredit:"Hide \"by Ameer Gift\" (premium)",template:"Template",contact:"Contact WhatsApp (shown when a trial ends)",hidePrice:"Price to hide the Ameer Gift credit",
-  modH:"Visitor comments in all museums",modP:"Latest comments in active museums. Deleting is permanent.",loadMore:"Load",logH:"Activity log",act:{activate:"Activation",reject:"Rejection",trial:"Trial",pricing:"Price change",code:"Discount code",deleteComment:"Comment deleted",role:"Roles"},
+  modH:"Visitor comments in all museums",modP:"Latest comments in active museums. Deleting is permanent.",loadMore:"Load",logH:"Activity log",act:{deleteMuseum:"Museum deleted",activate:"Activation",reject:"Rejection",trial:"Trial",pricing:"Price change",code:"Discount code",deleteComment:"Comment deleted",role:"Roles"},
   tplName:{classic:"Classic Gold",garden:"Garden",wedding:"Wedding",grad:"Graduation"},
   galleries:"All museums",pending:"Awaiting check",active:"Active",drafts:"Drafts",rejected:"Rejected",revenue:"Sales",thisMonth:"This month",trials:"Trials sent",converted:"Trials that bought",complaints:"Open complaints",feedbacks:"All feedback",last14:"Orders sent in the last 14 days",companies:"Company museums",
   st:{draft:"Draft",pending:"Awaiting check",active:"Active",rejected:"Rejected"},all:"All",customer:"Customer",phone:"Mobile",pkg:"Package",visitors:"Visitors",rooms:"Halls",photos:"Photos",price:"Amount",code:"Discount code",opens:"Opens",now:"On activation",receipt:"Receipt",noReceipt:"No receipt",
-  activate:"Confirm payment & activate",reject:"Reject",rejectQ:"Rejection reason (shown to the customer):",activating:"Activating…",activated:"Activated",sendCust:"Send to customer on WhatsApp",link:"Link",pinL:"Access code",copy:"Copy",copied:"Copied",none:"Nothing here",
+  activate:"Confirm payment & activate",delMuseum:"Delete museum",delMuseumQ:n=>`Delete the museum "${n}" with its photos, comments and access code for good? This cannot be undone.`,delMuseumType:"To confirm, type: حذف",delMuseumSure:"You did not type the word. Delete anyway?",deleting:"Deleting…",deleted:"Museum deleted",reject:"Reject",rejectQ:"Rejection reason (shown to the customer):",activating:"Activating…",activated:"Activated",sendCust:"Send to customer on WhatsApp",link:"Link",pinL:"Access code",copy:"Copy",copied:"Copied",none:"Nothing here",
   trialH:"Send a one-hour trial",trialP:"Sent under the Ameer Gift name with most features, once per mobile number.",custName:"Customer name",custPhone:"Customer mobile with country code",createTrial:"Create trial",trialUsed:"This number already had a trial",trialOk:"Trial created, send it now",recentTrials:"Recent trials",expired:"Expired",live:"Live",by:"by",
   pkgs:"Packages",addPkg:"Add package",nameAr:"Arabic name",nameEn:"English name",months:"Months",biz:"Company package",side:"Side room price",bank:"Transfer details",bankName:"Bank",holder:"Account holder",account:"Account number",note:"Note for customers",save:"Save",savedOk:"Saved",removePkg:"Remove package",
   newCode:"New code",codeL:"Code",type:"Type",percent:"Percent %",amount:"Fixed amount",value:"Value",currency:"Currency",maxUses:"Max uses (empty = unlimited)",expires:"Expires on (optional)",create:"Create",used:"Used",disable:"Disable",enable:"Enable",del:"Delete",delQ:"Delete for sure?",exists:"This code exists",badCodeName:"Use English letters and digits only",
@@ -233,8 +233,26 @@ async function orderCard(g, pr, p) {
       acts.append(el("a", { class: "btn sm gold", target: "_blank", rel: "noopener", href: "https://wa.me/" + ph + "?text=" + encodeURIComponent(custMsg(g, url, pin)), text: t("sendCust") }),
         el("a", { class: "btn sm ghost", target: "_blank", rel: "noopener", href: url, text: t("link") })); } } catch (e) {}
   }
+  // admins only: remove the museum and everything that belongs to it
+  acts.append(el("button", { class: "btn sm danger", text: t("delMuseum"), onclick: async e => {
+    if (!confirm(T[lang].delMuseumQ(g.title || g.id))) return;
+    if (prompt(t("delMuseumType")) !== "حذف" && !confirm(t("delMuseumSure"))) return;
+    e.target.disabled = true; e.target.textContent = t("deleting");
+    try { await deleteMuseum(g); toast(t("deleted")); orders(p); }
+    catch (x) { console.error(x); toast(t("noPerm") + " " + (x.code || ""), "bad"); e.target.disabled = false; e.target.textContent = t("delMuseum"); }
+  } }));
   if (acts.childNodes.length) c.append(acts);
   return c;
+}
+async function deleteMuseum(g) {
+  const delAll = async path => { const s = await fs.getDocs(fs.collection(db, path)); for (const d of s.docs) await fs.deleteDoc(d.ref); };
+  let key = "";
+  try { const a = await fs.getDoc(fs.doc(db, "galleries", g.id, "private", "access")); key = a.exists() ? a.data().key : ""; } catch (e) {}
+  if (key) { await delAll(`vaults/${key}/photos`); await delAll(`vaults/${key}/social`); await fs.deleteDoc(fs.doc(db, "vaults", key)); }
+  await delAll(`galleries/${g.id}/photos`); await delAll(`galleries/${g.id}/private`);
+  for (const ref of [fs.doc(db, "teasers", g.id), fs.doc(db, "visits", g.id)]) { try { await fs.deleteDoc(ref); } catch (e) {} }
+  await fs.deleteDoc(fs.doc(db, "galleries", g.id));
+  audit("deleteMuseum", g.id, { title: g.title || "" });
 }
 function custMsg(g, url, pin) { return (g.lang || lang) === "ar"
   ? `مرحبًا ${g.contact?.name || ""} 🌟\nتم تفعيل معرضك «${g.title}» في هدايا أمير.\nالرابط: ${url}\nرمز الدخول: ${pin}\nأرسلهما لمن تحب 🎁`

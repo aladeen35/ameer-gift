@@ -2,7 +2,7 @@
 import { test, before, after } from "node:test";
 import fs from "node:fs";
 import { initializeTestEnvironment, assertSucceeds, assertFails } from "@firebase/rules-unit-testing";
-import { doc, getDoc, setDoc, updateDoc, Timestamp, increment } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, deleteDoc, Timestamp, increment } from "firebase/firestore";
 import { ref, set, get } from "firebase/database";
 
 let env;
@@ -74,6 +74,16 @@ test("visit counter only goes up by one", async () => {
   await assertFails(updateDoc(doc(db, "visits/g1"), { count: 999 }));
   await assertFails(getDoc(doc(db, "visits/g1")));
   await assertSucceeds(getDoc(doc(env.authenticatedContext("owner1").firestore(), "visits/g1")));
+});
+test("only admins delete a museum and its parts", async () => {
+  const owner = env.authenticatedContext("owner1").firestore(), admin = env.authenticatedContext("admin1").firestore();
+  await assertFails(deleteDoc(doc(owner, "galleries/g1")));
+  await assertFails(deleteDoc(doc(owner, "vaults/g1-open/photos/p1")));
+  await assertFails(deleteDoc(doc(owner, "visits/g1")));
+  await assertSucceeds(deleteDoc(doc(admin, "vaults/g1-open/photos/p1")));
+  await assertSucceeds(deleteDoc(doc(admin, "visits/g1")));
+  await assertSucceeds(deleteDoc(doc(admin, "teasers/g1")));
+  await assertSucceeds(deleteDoc(doc(admin, "galleries/g1")));
 });
 test("only staff create trials and vaults; audit lines carry the author", async () => {
   await assertFails(setDoc(doc(anon().firestore(), "trials/966500000000"), { name: "x" }));
