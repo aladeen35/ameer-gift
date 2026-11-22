@@ -1,5 +1,18 @@
 # خطوات صاحب المشروع (من الجوال)
 
+> عنوان الموقع: **https://amir.albushra.app** (والرابط القديم `aladeen35.github.io/ameer-gift` يحوّل إليه تلقائيًا).
+
+## ⓪ ربط النطاق amir.albushra.app (مرة واحدة)
+
+1. في لوحة DNS الخاصة بـ `albushra.app` (غالبًا Cloudflare) أضف سجلًا:
+   - النوع **CNAME**، الاسم **amir**، القيمة **aladeen35.github.io**
+   - في Cloudflare اجعل السحابة **رمادية (DNS only)** وليست برتقالية، وإلا لن تصدر شهادة الأمان.
+2. في GitHub: `github.com/aladeen35/ameer-gift/settings/pages` ← خانة **Custom domain** ← اكتب `amir.albushra.app` ← **Save**.
+3. انتظر حتى يظهر «DNS check successful»، ثم فعّل **Enforce HTTPS** (قد يستغرق حتى ساعة).
+4. في Firebase ← Authentication ← Settings ← Authorized domains أضف `amir.albushra.app` (عملية التفعيل التلقائية تضيفه أيضًا).
+
+---
+
 كل الخطوات تتم من متصفح الجوال، ولا تحتاج كمبيوتر. نفّذها بالترتيب.
 
 ---

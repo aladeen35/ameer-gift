@@ -76,6 +76,7 @@ jobs:
           echo "SHA-256 fingerprint: $FP"
           printf '[{\n  "relation": ["delegate_permission/common.handle_all_urls"],\n  "target": { "namespace": "android_app", "package_name": "com.ameergift.app", "sha256_cert_fingerprints": ["%s"] }\n}]\n' "$FP" > assetlinks.json
           cat assetlinks.json
+          echo "Put this file in the repo at public/.well-known/assetlinks.json (served at https://amir.albushra.app/.well-known/assetlinks.json)"
           echo "### Android build" >> "$GITHUB_STEP_SUMMARY"
           echo "SHA-256: \`$FP\`" >> "$GITHUB_STEP_SUMMARY"
       - name: Upload the app

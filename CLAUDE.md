@@ -93,6 +93,7 @@ Done (everything that works on the free Spark plan):
 - Rules: `firestore.rules`, `database.rules.json`, tests in `tests/rules/` (`npm run test:rules`, Java needed).
 - CI: `.github/workflows/deploy.yml` (lint, build, rules tests, Playwright at 390×844, deploy from `main`), `android.yml` (Bubblewrap TWA).
 - Owner console steps: `docs/OWNER-STEPS-AR.md`.
+- Custom domain: **https://amir.albushra.app** (`public/CNAME`, DNS CNAME `amir` → `aladeen35.github.io`). Android TWA host is this domain; `assetlinks.json` goes in `public/.well-known/`.
 
 Still needs Blaze: Storage (songs, video, photo migration), Cloud Functions (AI captions, server-side PIN check, payments).
 

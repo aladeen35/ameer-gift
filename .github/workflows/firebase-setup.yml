@@ -17,7 +17,7 @@ permissions:
 
 env:
   REGION: europe-west1
-  SITE_DOMAIN: aladeen35.github.io
+  SITE_DOMAINS: "amir.albushra.app aladeen35.github.io"
 
 jobs:
   setup:
@@ -105,7 +105,7 @@ jobs:
           API="https://identitytoolkit.googleapis.com/admin/v2/projects/$PROJECT/config"
           CUR=$(curl -sS -H "Authorization: Bearer $TOKEN" -H "x-goog-user-project: $PROJECT" "$API")
           echo "$CUR" | grep -q '"name"' || { echo "$CUR"; exit 1; }
-          DOMAINS=$(echo "$CUR" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const c=JSON.parse(s);const d=new Set(c.authorizedDomains||[]);d.add(process.env.SITE_DOMAIN);console.log(JSON.stringify([...d]))})')
+          DOMAINS=$(echo "$CUR" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const c=JSON.parse(s);const d=new Set(c.authorizedDomains||[]);process.env.SITE_DOMAINS.split(" ").forEach(x=>d.add(x));console.log(JSON.stringify([...d]))})')
           BODY=$(node -e 'console.log(JSON.stringify({signIn:{anonymous:{enabled:true},email:{enabled:true,passwordRequired:true}},authorizedDomains:JSON.parse(process.argv[1])}))' "$DOMAINS")
           OUT=$(curl -sS -X PATCH -H "Authorization: Bearer $TOKEN" -H "x-goog-user-project: $PROJECT" -H "Content-Type: application/json" \
             "$API?updateMask=signIn.anonymous.enabled,signIn.email.enabled,signIn.email.passwordRequired,authorizedDomains" -d "$BODY")
