@@ -57,3 +57,14 @@ test("unknown museum link explains the problem", async ({ page }, info) => {
   await expect(page.locator("#msg")).toBeVisible({ timeout: 30000 });
   await shot(page, info, "bad-link");
 });
+
+test("footer links to the about and privacy pages inside the site", async ({ page }, info) => {
+  await page.goto("index.html");
+  await expect(page.locator("#privLnk")).toHaveAttribute("href", /^privacy\.html\?lang=/, { timeout: 20000 });
+  await page.locator("#aboutLnk").click();
+  await expect(page).toHaveURL(/about\.html/);
+  await expect(page.locator("a[href^='privacy.html']").first()).toBeAttached();
+  await shot(page, info, "about");
+  await page.goto("privacy.html");
+  await expect(page.locator("body")).toContainText("Gemini");
+});
